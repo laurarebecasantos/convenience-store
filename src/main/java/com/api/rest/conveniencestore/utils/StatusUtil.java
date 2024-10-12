@@ -1,4 +1,4 @@
-package com.api.rest.conveniencestore.model;
+package com.api.rest.conveniencestore.utils;
 
 import com.api.rest.conveniencestore.enums.Status;
 

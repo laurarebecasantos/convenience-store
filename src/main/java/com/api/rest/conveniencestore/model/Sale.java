@@ -3,6 +3,7 @@ package com.api.rest.conveniencestore.model;
 import com.api.rest.conveniencestore.dto.SaleDto;
 import com.api.rest.conveniencestore.enums.PaymentMethod;
 import com.api.rest.conveniencestore.enums.Status;
+import com.api.rest.conveniencestore.utils.StatusUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Sale implements StatusUtil{
+public class Sale implements StatusUtil {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

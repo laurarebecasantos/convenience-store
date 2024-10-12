@@ -10,7 +10,7 @@ public enum Status {
     CANCELLED;
 
     @JsonCreator
-    public static Status fromValueStatus(String value) { //converte uma string que vem do json para uma enum
+    public static Status fromValueStatus(String value) {
         return Status.valueOf(value.toUpperCase());
     }
 

@@ -29,7 +29,7 @@ public class Client {
         this.name = data.name();
     }
 
-    public void setCpf(Client client) { //setter
+    public void setCpf(Client client) {
         this.cpf = cpf;
     }
 

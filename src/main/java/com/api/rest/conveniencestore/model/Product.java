@@ -4,6 +4,7 @@ import com.api.rest.conveniencestore.dto.ProductDto;
 import com.api.rest.conveniencestore.dto.ProductUpdateDto;
 import com.api.rest.conveniencestore.enums.Category;
 import com.api.rest.conveniencestore.enums.Status;
+import com.api.rest.conveniencestore.utils.StatusUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product implements StatusUtil{
+public class Product implements StatusUtil {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,7 +71,7 @@ public class Product implements StatusUtil{
         }
     }
 
-    public void setStatus(Status status) { //setter status
+    public void setStatus(Status status) {
         this.status = status;
     }
 

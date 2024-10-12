@@ -7,7 +7,7 @@ public enum Roles {
     ADMIN;
 
     @JsonCreator
-    public static Roles fromValueRoles(String value) { //converte uma string que vem do json para uma enum
+    public static Roles fromValueRoles(String value) {
         return Roles.valueOf(value.toUpperCase());
     }
 }

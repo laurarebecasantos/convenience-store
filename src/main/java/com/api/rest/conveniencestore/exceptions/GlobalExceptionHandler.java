@@ -116,6 +116,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    @ExceptionHandler(TokenGenerationException.class)
+    public ResponseEntity<ErrorResponse> tokenGenerationException(TokenGenerationException except) {
+        ErrorResponse errorResponse = new ErrorResponse("401", except.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException500() {
         ErrorResponse errorResponse = new ErrorResponse("500", "An unexpected error occurred.");

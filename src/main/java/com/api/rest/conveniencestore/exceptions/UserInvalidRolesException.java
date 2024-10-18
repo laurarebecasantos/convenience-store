@@ -5,3 +5,4 @@ public class UserInvalidRolesException extends Exception{
         super(message);
     }
 }
+

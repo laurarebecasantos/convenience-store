@@ -5,3 +5,4 @@ public class AutheticationInvalidException extends Exception {
         super(message);
     }
 }
+

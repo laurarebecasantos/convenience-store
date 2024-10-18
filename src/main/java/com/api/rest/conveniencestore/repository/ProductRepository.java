@@ -19,3 +19,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByExpirationDate(LocalDate expirationDate);
 }
 
+

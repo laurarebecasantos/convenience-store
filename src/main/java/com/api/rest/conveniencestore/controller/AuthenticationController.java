@@ -1,6 +1,7 @@
 package com.api.rest.conveniencestore.controller;
 
 import com.api.rest.conveniencestore.dto.AuthenticationDto;
+import com.api.rest.conveniencestore.dto.TokenJWTDto;
 import com.api.rest.conveniencestore.exceptions.AutheticationInvalidException;
 import com.api.rest.conveniencestore.model.User;
 import com.api.rest.conveniencestore.service.TokenService;
@@ -27,12 +28,14 @@ public class AuthenticationController {
     private TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<String> login(@Valid @RequestBody AuthenticationDto autDto) throws AutheticationInvalidException {
-        var token = new UsernamePasswordAuthenticationToken(autDto.username(), autDto.password());
+    public ResponseEntity<TokenJWTDto> login(@Valid @RequestBody AuthenticationDto autDto) throws AutheticationInvalidException {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(autDto.username(), autDto.password());
+
         try {
-            Authentication authentication = manager.authenticate(token);
+            Authentication authentication = manager.authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return ResponseEntity.ok(tokenService.generateToken((User) authentication.getPrincipal()));
+            String tokenJWT = tokenService.generateToken((User) authentication.getPrincipal());
+            return  ResponseEntity.ok(new TokenJWTDto(tokenJWT));
         } catch (Exception e) {
             throw new AutheticationInvalidException("Credentials: Invalid username or password.");
         }

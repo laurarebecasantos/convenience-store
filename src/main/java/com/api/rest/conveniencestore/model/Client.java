@@ -36,5 +36,4 @@ public class Client {
     public void setName(Client client) {
         this.name = name;
     }
-
 }

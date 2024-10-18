@@ -5,3 +5,4 @@ public class UserNotValidPassword extends Exception {
         super(message);
     }
 }
+

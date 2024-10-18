@@ -5,3 +5,4 @@ public class ProductInactiveException extends Exception{
         super(message);
     }
 }
+

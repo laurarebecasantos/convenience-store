@@ -11,3 +11,4 @@ public enum Roles {
         return Roles.valueOf(value.toUpperCase());
     }
 }
+

@@ -10,3 +10,4 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
      Collection<Sale> findByPaymentMethod(PaymentMethod paymentMethod);
 }
+

@@ -25,3 +25,4 @@ public record ProductDto(
 
         LocalDate expirationDate) {
 }
+

@@ -5,3 +5,4 @@ public class ProductInsufficientStockException extends Exception {
         super(message);
     }
 }
+

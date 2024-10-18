@@ -13,6 +13,4 @@ public enum Status {
     public static Status fromValueStatus(String value) {
         return Status.valueOf(value.toUpperCase());
     }
-
-
 }

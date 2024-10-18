@@ -5,3 +5,4 @@ public class ClientCpfNotFoundException extends Exception {
         super(message);
     }
 }
+

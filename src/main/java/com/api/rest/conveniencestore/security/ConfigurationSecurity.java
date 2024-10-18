@@ -35,3 +35,4 @@ public class ConfigurationSecurity {
         return configuration.getAuthenticationManager();
     }
 }
+

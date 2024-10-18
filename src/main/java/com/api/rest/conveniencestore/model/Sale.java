@@ -58,3 +58,4 @@ public class Sale implements StatusUtil {
         this.status = status;
     }
 }
+

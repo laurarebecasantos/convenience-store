@@ -8,6 +8,9 @@ import com.api.rest.conveniencestore.model.User;
 import com.api.rest.conveniencestore.service.UserService;
 import com.api.rest.conveniencestore.dto.UserUpdateDto;
 import com.api.rest.conveniencestore.enums.Status;
+import com.api.rest.conveniencestore.utils.MessageConstants;
+import com.api.rest.conveniencestore.validations.PasswordValidator;
+import com.api.rest.conveniencestore.validations.UserValidator;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("users")
@@ -28,22 +32,21 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private PasswordValidator passwordValidator;
+
+    @Autowired
+    private UserValidator userValidator;
+
     @PostMapping
     @Transactional
-    public ResponseEntity<User> register(@Valid @RequestBody UserDto userDto) throws UserRegistrationException, UserNotValidPassword, UserEmailNotFoundException{ //O spring se integra com o valid para aplicar as validações dos campos
-        if (userDto.username().length() < 3 || userDto.username().isEmpty() ) {
-            throw new UserRegistrationException("Username must be between 3 and 20 characters:");
-        }
-
-        if (userService.existsByUsername(userDto.username())) {
-            throw new UserRegistrationException("User already registered with the name: " + userDto.username());
-        }
+    public ResponseEntity<User> register(@Valid @RequestBody UserDto userDto) throws PasswordValidateException, UserEmailNotFoundException, UsernameValidateException {
+        userValidator.validateUsername(userDto.username());
 
         if (userService.existsByEmail(userDto.email())) {
-            throw new UserEmailNotFoundException("Email already registered." + userDto.email());
+            throw new UserEmailNotFoundException(MessageConstants.EMAIL_ALREADY_REGISTERED + userDto.email());
         }
-
-        validatePassword(userDto.password());
+        passwordValidator.validatePassword(userDto.password());
 
         User savedUser = userService.registerUser(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
@@ -53,24 +56,23 @@ public class UserController {
     public ResponseEntity<List<UserListingDto>> list() throws UserListingNullException {
         var returnList = userService.listUsers();
         if (returnList.isEmpty()) {
-            throw new UserListingNullException("No registered users were found.");
+            throw new UserListingNullException(MessageConstants.NO_USERS_FOUND);
         }
         return ResponseEntity.ok(returnList);
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<User> update( @PathVariable Long id, @Valid @RequestBody UserUpdateDto updateDto, UserDto userDto) throws UserNotFoundException, UserNotValidPassword {
-        User updateUser = userService.updateUser(id, updateDto);
+    public ResponseEntity<User> update( @PathVariable Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) throws UserNotFoundException, PasswordValidateException, UsernameValidateException {
+        User updateUser = userService.updateUser(id, userUpdateDto);
         return ResponseEntity.ok(updateUser);
     }
-
 
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<Void> delete(@PathVariable Long id) throws UserNotFoundException {
         if (!userService.existsById(id)) {
-            throw new UserNotFoundException("User with id " + id + " not found");
+            throw new UserNotFoundException(String.format(MessageConstants.USER_NOT_FOUND, id));
         }
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
@@ -84,15 +86,15 @@ public class UserController {
         try {
             statusInactive = Status.fromValueStatus(statusString);
         } catch (IllegalArgumentException e) {
-            throw new UserInvalidStatusException("Invalid status: " + statusString);
+            throw new UserInvalidStatusException(MessageConstants.INVALID_STATUS + statusString);
         }
 
         if (!Status.INACTIVE.equals(statusInactive)) {
-            throw new UserInvalidStatusException("The status can only be changed to INACTIVE.");
+            throw new UserInvalidStatusException(MessageConstants.STATUS_INACTIVE);
         }
 
         if (!userService.existsById(id)) {
-            throw new UserNotFoundException("User with ID: " + id + " not found.");
+            throw new UserNotFoundException(String.format(MessageConstants.USER_NOT_FOUND, id));
         }
 
         User updatedStatusUser = userService.statusUserInactive(id, statusInactive);
@@ -107,29 +109,18 @@ public class UserController {
         try {
             rolesAdmin= Roles.fromValueRoles(rolesString);
         } catch (IllegalArgumentException e) {
-            throw new UserInvalidRolesException("Invalid role: " + rolesString);
+            throw new UserInvalidRolesException(MessageConstants.INVALID_ROLE + rolesString);
         }
 
         if (!Roles.ADMIN.equals(rolesAdmin)) {
-            throw new UserInvalidRolesException("The role can only be changed to ADMIN.");
+            throw new UserInvalidRolesException(MessageConstants.ROLE_ADMIN);
         }
 
         if (!userService.existsById(id)) {
-            throw new UserNotFoundException("User with ID: " + id + " not found.");
+            throw new UserNotFoundException(String.format(MessageConstants.USER_NOT_FOUND, id));
         }
 
         User updatedRoleAdmin = userService.roleUserAdmin(id, rolesAdmin);
         return ResponseEntity.ok(updatedRoleAdmin);
     }
-
-    private void validatePassword(String password) throws UserNotValidPassword {
-        if (password.length() < 8) {
-            throw new UserNotValidPassword("The password must be at least 8 characters long.");
-        }
-        if (!password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}$")) {
-            throw new UserNotValidPassword("The password must contain at least one uppercase letter, one lowercase letter, and one number.");
-        }
-    }
-
 }
-

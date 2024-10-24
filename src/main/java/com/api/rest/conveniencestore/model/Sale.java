@@ -45,6 +45,7 @@ public class Sale implements StatusUtil {
     @Column(nullable = false, name = "date_sale")
     private LocalDateTime saleDate;
 
+
     public Sale(SaleDto saleDto, double totalValue, String description, int quantity, LocalDateTime saleDate) {
         this.description = description;
         this.quantity = quantity;
@@ -58,4 +59,3 @@ public class Sale implements StatusUtil {
         this.status = status;
     }
 }
-

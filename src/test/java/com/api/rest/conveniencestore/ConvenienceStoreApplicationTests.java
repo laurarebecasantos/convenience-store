@@ -1,10 +1,10 @@
-package com.api.rest.user_registration;
+package com.api.rest.conveniencestore;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserRegistrationApplicationTests {
+class ConvenienceStoreApplicationTests {
 
 	@Test
 	void contextLoads() {

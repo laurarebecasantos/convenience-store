@@ -60,5 +60,3 @@ public class ProductService {
         return productRepository.findByExpirationDate(dateNow);
     }
 }
-
-

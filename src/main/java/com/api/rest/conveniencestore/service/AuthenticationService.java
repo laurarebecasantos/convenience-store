@@ -1,6 +1,7 @@
 package com.api.rest.conveniencestore.service;
 
 import com.api.rest.conveniencestore.repository.UserRepository;
+import com.api.rest.conveniencestore.utils.MessageConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,7 +21,6 @@ public class AuthenticationService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(MessageConstants.USERNAME_NOT_FOUND));
     }
 }
-

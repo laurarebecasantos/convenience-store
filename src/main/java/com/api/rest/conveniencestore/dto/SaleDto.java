@@ -19,6 +19,4 @@ public record SaleDto(
         @NotNull(message = "Payment method cannot be null")
         PaymentMethod paymentMethod
 ) {
-
 }
-

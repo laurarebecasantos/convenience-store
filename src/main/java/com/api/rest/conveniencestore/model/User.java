@@ -4,7 +4,9 @@ import com.api.rest.conveniencestore.dto.UserDto;
 import com.api.rest.conveniencestore.dto.UserUpdateDto;
 import com.api.rest.conveniencestore.enums.Roles;
 import com.api.rest.conveniencestore.enums.Status;
-import com.api.rest.conveniencestore.exceptions.UserNotValidPassword;
+import com.api.rest.conveniencestore.exceptions.PasswordValidateException;
+import com.api.rest.conveniencestore.exceptions.UsernameValidateException;
+import com.api.rest.conveniencestore.validations.PasswordValidator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -17,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collection;
+import java.util.Collections;
 
 @Table(name = "users")
 @Entity(name = "User")
@@ -58,24 +61,13 @@ public class User implements UserDetails {
         this.role = Roles.USER;
     }
 
-    public void updateData(UserUpdateDto userUpdateDto, PasswordEncoder passwordEncoder) throws UserNotValidPassword {
+    public void updateData(UserUpdateDto userUpdateDto, PasswordEncoder passwordEncoder) throws PasswordValidateException, UsernameValidateException {
         if (userUpdateDto.username() != null) {
             this.username = userUpdateDto.username();
         }
-        if (userUpdateDto.password() != null && !userUpdateDto.password().isBlank()) {
-            validatePassword(userUpdateDto.password());
-            String encryptedPassword = passwordEncoder.encode(userUpdateDto.password());
-            this.password = encryptedPassword;
-        }
-    }
-
-    private void validatePassword(String password) throws UserNotValidPassword {
-        if (password.length() < 8) {
-            throw new UserNotValidPassword("The password must be at least 8 characters long.");
-        }
-        if (!password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}$")) {
-            throw new UserNotValidPassword("The password must contain at least one uppercase letter, one lowercase letter, and one number.");
-        }
+        PasswordValidator.validatePassword(userUpdateDto.password());
+        String encryptedPassword = passwordEncoder.encode(userUpdateDto.password());
+        this.password = encryptedPassword;
     }
 
     public void setStatus(Status status) { //setter status
@@ -90,17 +82,10 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return Collections.singletonList(() -> "ROLE: " + this.role);
     }
 
     @JsonIgnore
@@ -120,5 +105,10 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
-}
 
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+}

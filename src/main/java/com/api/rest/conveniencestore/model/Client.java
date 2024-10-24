@@ -1,11 +1,11 @@
 package com.api.rest.conveniencestore.model;
 
 import com.api.rest.conveniencestore.dto.ClientDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 
 @Table(name = "Clients")
 @Entity(name = "Client")
@@ -20,7 +20,6 @@ public class Client {
 
     private String name;
 
-    @JsonIgnore
     @Column(unique = true)
     private String cpf;
 
@@ -36,4 +35,5 @@ public class Client {
     public void setName(Client client) {
         this.name = name;
     }
+
 }

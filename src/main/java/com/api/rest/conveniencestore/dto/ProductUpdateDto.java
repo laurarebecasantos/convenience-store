@@ -14,4 +14,3 @@ public record ProductUpdateDto(
 
         Status status) {
 }
-

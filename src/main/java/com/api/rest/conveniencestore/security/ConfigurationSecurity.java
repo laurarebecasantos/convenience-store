@@ -19,10 +19,10 @@ public class ConfigurationSecurity {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Define que o sistema será stateless (sem sessão)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/**").permitAll()
-                                .anyRequest().authenticated());
+                        .anyRequest().authenticated());
         return http.build();
     }
     @Bean
@@ -35,4 +35,3 @@ public class ConfigurationSecurity {
         return configuration.getAuthenticationManager();
     }
 }
-

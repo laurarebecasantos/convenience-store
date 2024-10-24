@@ -6,9 +6,11 @@ import com.api.rest.conveniencestore.dto.UserUpdateDto;
 import com.api.rest.conveniencestore.enums.Roles;
 import com.api.rest.conveniencestore.enums.Status;
 import com.api.rest.conveniencestore.exceptions.UserNotFoundException;
-import com.api.rest.conveniencestore.exceptions.UserNotValidPassword;
+import com.api.rest.conveniencestore.exceptions.PasswordValidateException;
+import com.api.rest.conveniencestore.exceptions.UsernameValidateException;
 import com.api.rest.conveniencestore.model.User;
 import com.api.rest.conveniencestore.repository.UserRepository;
+import com.api.rest.conveniencestore.utils.MessageConstants;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,7 @@ public class UserService {
     @Transactional
     public User registerUser(UserDto userDto) {
         String encryptedPassword = passwordEncoder.encode(userDto.password());
-        log.debug("Encrypted password: " + encryptedPassword);
+        log.debug("Senha criptografada: " + encryptedPassword);
         User user = new User(userDto);
         user.setPassword(encryptedPassword);
         return userRepository.save(user);
@@ -58,9 +60,9 @@ public class UserService {
     }
 
     @Transactional
-    public User updateUser(Long id, UserUpdateDto userUpdateDto) throws UserNotFoundException, UserNotValidPassword {
+    public User updateUser(Long id, UserUpdateDto userUpdateDto) throws UserNotFoundException, PasswordValidateException, UsernameValidateException {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new UserNotFoundException(String.format(MessageConstants.USER_NOT_FOUND, id)));
         user.updateData(userUpdateDto, passwordEncoder);
         return userRepository.save(user);
     }
@@ -89,5 +91,3 @@ public class UserService {
         return userRepository.save(user);
     }
 }
-
-

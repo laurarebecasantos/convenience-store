@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserRegistrationException.class)
-    public ResponseEntity userRegistrationException(UserRegistrationException except) {
+    public ResponseEntity userRegistrationException(UserRegistrationException except) { //POST USER
         ErrorResponse errorResponse = new ErrorResponse("409", except.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
@@ -40,6 +40,24 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserInvalidRolesException.class)
     public ResponseEntity<ErrorResponse> userInvalidRolesException(UserInvalidRolesException except) {
+        ErrorResponse errorResponse = new ErrorResponse("400", except.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(PasswordValidateException.class)
+    public ResponseEntity<ErrorResponse> passwordNotValidException(PasswordValidateException except) {
+        ErrorResponse errorResponse = new ErrorResponse("400", except.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(UsernameValidateException.class)
+    public ResponseEntity<ErrorResponse> usernameNotValidException(UsernameValidateException except) {
+        ErrorResponse errorResponse = new ErrorResponse("400", except.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(NameValidateException.class)
+    public ResponseEntity<ErrorResponse> nameValidateException(NameValidateException except) {
         ErrorResponse errorResponse = new ErrorResponse("400", except.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -98,27 +116,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(ClientCpfNotFoundException.class)
-    public ResponseEntity<ErrorResponse> clientCpfNotFoundException(ClientCpfNotFoundException except) {
-        ErrorResponse errorResponse = new ErrorResponse("404", except.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    @ExceptionHandler(CpfValidateException.class)
+    public ResponseEntity<ErrorResponse> clientCpfAlreadyExistsException(CpfValidateException except) {
+        ErrorResponse errorResponse = new ErrorResponse("409", except.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    @ExceptionHandler(AutheticationInvalidException.class)
-    public ResponseEntity handleError401(AutheticationInvalidException except) {
+    @ExceptionHandler(AutheticationException.class)
+    public ResponseEntity handleError401(AutheticationException except) {
         ErrorResponse errorResponse = new ErrorResponse("Unauthorized", except.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-    }
-
-    @ExceptionHandler(UserNotValidPassword.class)
-    public ResponseEntity<ErrorResponse> userNotValidExceptions(UserNotValidPassword except) {
-        ErrorResponse errorResponse = new ErrorResponse("400", except.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
-    @ExceptionHandler(TokenGenerationException.class)
-    public ResponseEntity<ErrorResponse> tokenGenerationException(TokenGenerationException except) {
-        ErrorResponse errorResponse = new ErrorResponse("401", except.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
@@ -128,4 +134,3 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
-

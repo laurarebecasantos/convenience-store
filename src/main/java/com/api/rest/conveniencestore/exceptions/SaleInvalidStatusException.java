@@ -5,3 +5,4 @@ public class SaleInvalidStatusException extends Exception{
         super (message);
     }
 }
+

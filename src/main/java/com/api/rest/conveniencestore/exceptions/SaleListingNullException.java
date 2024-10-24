@@ -5,3 +5,4 @@ public class SaleListingNullException extends Exception {
         super(message);
     }
 }
+

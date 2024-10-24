@@ -5,3 +5,4 @@ public class SaleNotValidPaymentMethodException extends Exception {
         super(message);
     }
 }
+

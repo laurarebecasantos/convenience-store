@@ -7,3 +7,4 @@ public class UserInvalidStatusException extends Exception {
         super(message);
     }
 }
+

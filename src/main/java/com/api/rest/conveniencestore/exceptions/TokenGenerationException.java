@@ -5,3 +5,4 @@ public class TokenGenerationException extends Exception{
         super(message);
     }
 }
+

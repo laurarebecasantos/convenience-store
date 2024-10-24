@@ -6,3 +6,4 @@ public interface StatusUtil {
     void setStatus(Status status);
     Status getStatus();
 }
+

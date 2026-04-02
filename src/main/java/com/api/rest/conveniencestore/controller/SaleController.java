@@ -5,10 +5,8 @@ import com.api.rest.conveniencestore.dto.SaleListingDto;
 import com.api.rest.conveniencestore.enums.PaymentMethod;
 import com.api.rest.conveniencestore.enums.Status;
 import com.api.rest.conveniencestore.exceptions.*;
-import com.api.rest.conveniencestore.model.Client;
 import com.api.rest.conveniencestore.model.Sale;
 import com.api.rest.conveniencestore.repository.SaleRepository;
-import com.api.rest.conveniencestore.service.SaleHelper;
 import com.api.rest.conveniencestore.service.SaleService;
 import com.api.rest.conveniencestore.utils.MessageConstants;
 import jakarta.transaction.Transactional;
@@ -33,8 +31,8 @@ public class SaleController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<Sale> register(@Valid @RequestBody SaleDto saleDto, Client client, SaleHelper saleHelper) throws ProductNotFoundException, ProductInactiveException, ProductInsufficientStockException, SaleNotValidPaymentMethodException, CpfValidateException {
-        Sale savedSale = saleService.registerSale(saleDto, client);
+    public ResponseEntity<Sale> register(@Valid @RequestBody SaleDto saleDto) throws ProductNotFoundException, ProductInactiveException, ProductInsufficientStockException, SaleNotValidPaymentMethodException, CpfValidateException {
+        Sale savedSale = saleService.registerSale(saleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedSale);
     }
 

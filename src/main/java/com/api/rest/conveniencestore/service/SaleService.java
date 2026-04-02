@@ -47,7 +47,11 @@ public class SaleService {
     }
 
     @Transactional
-    public Sale registerSale(SaleDto saleDto, Client client) throws ProductNotFoundException, ProductInactiveException, ProductInsufficientStockException, SaleNotValidPaymentMethodException {
+    public Sale registerSale(SaleDto saleDto) throws ProductNotFoundException, ProductInactiveException, ProductInsufficientStockException, SaleNotValidPaymentMethodException {
+
+        Client client = clientRepository.findByCpf(saleDto.clientCpf())
+                .orElseThrow(() -> new ClientCpfNotFoundException(
+                        com.api.rest.conveniencestore.utils.MessageConstants.CLIENT_NOT_FOUND_BY_CPF + saleDto.clientCpf()));
 
         double totalValue = saleHelper.calculateTotalValue(saleDto);
         String description = saleHelper.generateSaleDescription(saleDto, client);
@@ -82,7 +86,7 @@ public class SaleService {
     @Transactional
     public Sale statusSaleCanceled(Long id, Status status) {
         Sale sale = saleRepository.getReferenceById(id);
-        sale.setStatus(status.CANCELLED);
+        sale.setStatus(Status.CANCELLED);
         return saleRepository.save(sale);
     }
 }

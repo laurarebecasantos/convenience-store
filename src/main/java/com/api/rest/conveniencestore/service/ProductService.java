@@ -50,8 +50,13 @@ public class ProductService {
 
     @Transactional
     public Product statusProductInactive(Long id, Status status) {
+        return updateProductStatus(id, status);
+    }
+
+    @Transactional
+    public Product updateProductStatus(Long id, Status status) {
         Product product = productRepository.getReferenceById(id);
-        product.setStatus(status.INACTIVE);
+        product.setStatus(status);
         return productRepository.save(product);
     }
 

@@ -1,0 +1,127 @@
+package com.api.rest.conveniencestore.service;
+
+import com.api.rest.conveniencestore.dto.ClientDto;
+import com.api.rest.conveniencestore.dto.ProductDto;
+import com.api.rest.conveniencestore.dto.SaleDto;
+import com.api.rest.conveniencestore.dto.SaleListingDto;
+import com.api.rest.conveniencestore.enums.Category;
+import com.api.rest.conveniencestore.enums.PaymentMethod;
+import com.api.rest.conveniencestore.enums.Status;
+import com.api.rest.conveniencestore.exceptions.ClientCpfNotFoundException;
+import com.api.rest.conveniencestore.model.Client;
+import com.api.rest.conveniencestore.model.Product;
+import com.api.rest.conveniencestore.model.Sale;
+import com.api.rest.conveniencestore.repository.ClientRepository;
+import com.api.rest.conveniencestore.repository.ProductRepository;
+import com.api.rest.conveniencestore.repository.SaleRepository;
+import com.api.rest.conveniencestore.utils.DateUtil;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class SaleServiceTest {
+
+    @Mock
+    private SaleRepository saleRepository;
+
+    @Mock
+    private ProductRepository productRepository;
+
+    @Mock
+    private ClientRepository clientRepository;
+
+    @Mock
+    private DateUtil dateUtil;
+
+    @InjectMocks
+    private SaleService saleService;
+
+    private Product product;
+    private Client client;
+    private Sale sale;
+
+    @BeforeEach
+    void setUp() {
+        saleService.setSaleHelper();  // inicializa SaleHelper com o productRepository mockado
+
+        product = new Product(new ProductDto("Coca-Cola", Category.BEVERAGE, 5.0, 100, LocalDate.now().plusDays(30)));
+        client = new Client(new ClientDto("Maria Silva", "123.456.789-09"));
+        sale = new Sale(new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09"),
+                10.0, "desc", 2, LocalDateTime.now());
+    }
+
+    @Test
+    void registerSale_ShouldCreateSaleAndDecrementStock() throws Exception {
+        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09");
+
+        when(clientRepository.findByCpf("123.456.789-09")).thenReturn(Optional.of(client));
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.existsById(1L)).thenReturn(true);
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+        when(saleRepository.save(any(Sale.class))).thenReturn(sale);
+
+        Sale result = saleService.registerSale(dto);
+
+        assertThat(result).isNotNull();
+        verify(productRepository).save(any(Product.class));  // stock decremented
+        verify(saleRepository).save(any(Sale.class));
+    }
+
+    @Test
+    void registerSale_WhenClientNotFound_ShouldThrow() {
+        SaleDto dto = new SaleDto(List.of(1L), List.of(1), PaymentMethod.CASH, "000.000.000-00");
+        when(clientRepository.findByCpf("000.000.000-00")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> saleService.registerSale(dto))
+                .isInstanceOf(ClientCpfNotFoundException.class);
+    }
+
+    @Test
+    void listSalesByPaymentMethod_ShouldReturnFilteredSales() {
+        when(saleRepository.findByPaymentMethod(PaymentMethod.CASH)).thenReturn(List.of(sale));
+
+        List<SaleListingDto> result = saleService.listSalesByPaymentMethod(PaymentMethod.CASH);
+
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void listSalesByPaymentMethod_WhenNone_ShouldReturnEmpty() {
+        when(saleRepository.findByPaymentMethod(PaymentMethod.DEBIT)).thenReturn(List.of());
+
+        List<SaleListingDto> result = saleService.listSalesByPaymentMethod(PaymentMethod.DEBIT);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void statusSaleCanceled_ShouldSetCancelledStatus() {
+        when(saleRepository.getReferenceById(1L)).thenReturn(sale);
+        when(saleRepository.save(any(Sale.class))).thenReturn(sale);
+
+        Sale result = saleService.statusSaleCanceled(1L, Status.CANCELLED);
+
+        assertThat(result.getStatus()).isEqualTo(Status.CANCELLED);
+        verify(saleRepository).save(sale);
+    }
+
+    @Test
+    void existsById_WhenExists_ShouldReturnTrue() {
+        when(saleRepository.existsById(1L)).thenReturn(true);
+
+        assertThat(saleService.existsById(1L)).isTrue();
+    }
+}

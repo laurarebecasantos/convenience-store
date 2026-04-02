@@ -1,0 +1,392 @@
+{
+  "info": {
+    "name": "Convenience Store API",
+    "_postman_id": "convenience-store-collection",
+    "description": "Collection completa da API Convenience Store",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "  console.log('Token salvo automaticamente.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "Autentica o usuário e salva o token JWT automaticamente na variável {{token}}.\n\nNão requer autenticação."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Usuários",
+      "item": [
+        {
+          "name": "Cadastrar usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123\",\n  \"email\": \"admin@loja.com\",\n  \"role\": \"ADMIN\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Cria um novo usuário. Não requer autenticação.\n\nCampos obrigatórios:\n- username: nome de usuário\n- password: senha (mínimo 8 chars, 1 maiúscula, 1 número)\n- email: e-mail válido\n- role: USER ou ADMIN\n- status: ACTIVE ou INACTIVE"
+          }
+        },
+        {
+          "name": "Listar usuários",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Lista todos os usuários. Requer autenticação."
+          }
+        },
+        {
+          "name": "Atualizar usuário",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"novo_username\",\n  \"password\": \"NovaSenha@123\",\n  \"email\": \"novo@loja.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "1"]
+            },
+            "description": "Atualiza username, senha e/ou e-mail do usuário. Troque o '1' pelo ID real. Requer autenticação."
+          }
+        },
+        {
+          "name": "Deletar usuário",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "1"]
+            },
+            "description": "Remove o usuário pelo ID. Requer role ADMIN."
+          }
+        },
+        {
+          "name": "Alterar status do usuário",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "1", "status"]
+            },
+            "description": "Ativa ou desativa um usuário. Requer role ADMIN.\n\nValores aceitos: ACTIVE | INACTIVE"
+          }
+        },
+        {
+          "name": "Alterar role do usuário",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roles\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/1/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "1", "roles"]
+            },
+            "description": "Promove o usuário a ADMIN. Requer role ADMIN.\n\nValor aceito: ADMIN"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Clientes",
+      "item": [
+        {
+          "name": "Cadastrar cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva\",\n  \"cpf\": \"123.456.789-09\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clients",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients"]
+            },
+            "description": "Cadastra um novo cliente. CPF deve ser válido e único. Requer autenticação."
+          }
+        },
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/clients",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients"]
+            },
+            "description": "Lista todos os clientes cadastrados. Requer autenticação."
+          }
+        },
+        {
+          "name": "Buscar cliente por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/clients/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients", "1"]
+            },
+            "description": "Retorna um cliente pelo ID. Troque o '1' pelo ID real. Requer autenticação."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Produtos",
+      "item": [
+        {
+          "name": "Cadastrar produto",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Água Mineral 500ml\",\n  \"category\": \"BEVERAGE\",\n  \"price\": 3.50,\n  \"stockQuantity\": 100,\n  \"expirationDate\": \"2026-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            },
+            "description": "Cadastra um novo produto. Requer role ADMIN.\n\nCategorias: FUEL | FOOD | BEVERAGE | CLEANING_PRODUCTS\nexpirationDate: formato YYYY-MM-DD"
+          }
+        },
+        {
+          "name": "Listar produtos",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            },
+            "description": "Lista todos os produtos cadastrados. Requer autenticação."
+          }
+        },
+        {
+          "name": "Atualizar produto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 5.00,\n  \"stockQuantity\": 200,\n  \"expirationDate\": \"2027-06-30\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "1"]
+            },
+            "description": "Atualiza os dados de um produto. Troque o '1' pelo ID real. Requer role ADMIN."
+          }
+        },
+        {
+          "name": "Alterar status do produto",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "1", "status"]
+            },
+            "description": "Ativa ou desativa um produto. Troque o '1' pelo ID real. Requer role ADMIN.\n\nValores aceitos: ACTIVE | INACTIVE"
+          }
+        },
+        {
+          "name": "Listar produtos vencidos",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/duedate",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "duedate"]
+            },
+            "description": "Lista produtos vencidos ou próximos do vencimento. Requer autenticação."
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Vendas",
+      "item": [
+        {
+          "name": "Registrar venda",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productIds\": [1, 2],\n  \"quantity\": [2, 1],\n  \"paymentMethod\": \"CASH\",\n  \"clientCpf\": \"123.456.789-09\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"]
+            },
+            "description": "Registra uma nova venda. Requer autenticação.\n\n- productIds: lista de IDs dos produtos\n- quantity: lista de quantidades (mesma ordem dos IDs)\n- paymentMethod: CASH | CREDIT | DEBIT\n- clientCpf: CPF do cliente já cadastrado (formato 000.000.000-00)"
+          }
+        },
+        {
+          "name": "Listar vendas por forma de pagamento",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales?paymentMethod=CASH",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"],
+              "query": [
+                {
+                  "key": "paymentMethod",
+                  "value": "CASH",
+                  "description": "Valores: CASH | CREDIT | DEBIT"
+                }
+              ]
+            },
+            "description": "Lista vendas filtradas por forma de pagamento. Requer autenticação.\n\nValores: CASH | CREDIT | DEBIT"
+          }
+        },
+        {
+          "name": "Cancelar venda",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CANCELLED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "1", "status"]
+            },
+            "description": "Cancela uma venda. Troque o '1' pelo ID real. Requer role ADMIN.\n\nValor aceito: CANCELLED"
+          }
+        }
+      ]
+    }
+  ]
+}

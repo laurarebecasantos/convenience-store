@@ -1,6 +1,6 @@
 package com.api.rest.conveniencestore.exceptions;
 
-public class UserEmailNotFoundException extends Exception {
+public class UserEmailNotFoundException extends RuntimeException {
     public UserEmailNotFoundException(String message) {
         super(message);
     }

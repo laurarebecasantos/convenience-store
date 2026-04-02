@@ -1,6 +1,6 @@
 package com.api.rest.conveniencestore.exceptions;
 
-public class UserInvalidRolesException extends Exception{
+public class UserInvalidRolesException extends RuntimeException{
     public UserInvalidRolesException(String message) {
         super(message);
     }

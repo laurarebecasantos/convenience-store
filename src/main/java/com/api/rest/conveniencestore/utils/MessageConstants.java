@@ -9,6 +9,8 @@ public class MessageConstants {
     public static final String INVALID_STATUS = "Status inválido: ";
     public static final String NO_USERS_FOUND ="Nenhum usuário cadastrado foi encontrado.";
     public static final String STATUS_INACTIVE = "O status deve ser alterado apenas para INACTIVE.";
+    public static final String STATUS_ACTIVE_OR_INACTIVE = "O status deve ser ACTIVE ou INACTIVE.";
+    public static final String STATUS_ACTIVE_OR_INACTIVE_PRODUCT = "O status do produto deve ser ACTIVE ou INACTIVE.";
     public static final String PRODUCT_NOT_FOUND = "Produto com ID: %d não foi encontrado.";
     public static final String USER_NOT_FOUND = "User with id %d not found";
     public static final String PAYMENT_METHOD_EMPTY = "O método de pagamento não pode ser vazio.";
@@ -21,4 +23,7 @@ public class MessageConstants {
     public static final String STATUS_CANCELLED = "O status deve ser alterado apenas para CANCELLED.";
     public static final String SALE_NOT_FOUND = "Compra de ID: %d não foi encontrada.";
     public static final String CPF_ALREADY_EXISTS = "CPF já está registrado: ";
+    public static final String CLIENT_NOT_FOUND_BY_CPF = "Cliente com CPF não encontrado: ";
+    public static final String CLIENT_NOT_FOUND_BY_ID = "Cliente com ID %d não foi encontrado.";
+    public static final String NO_CLIENTS_FOUND = "Nenhum cliente cadastrado foi encontrado.";
 }

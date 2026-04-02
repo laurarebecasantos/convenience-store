@@ -28,11 +28,11 @@ public class Client {
         this.name = data.name();
     }
 
-    public void setCpf(Client client) {
+    public void setCpf(String cpf) {
         this.cpf = cpf;
     }
 
-    public void setName(Client client) {
+    public void setName(String name) {
         this.name = name;
     }
 

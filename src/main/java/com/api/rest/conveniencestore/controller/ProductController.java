@@ -75,15 +75,15 @@ public class ProductController {
             throw new ProductInvalidStatusException(MessageConstants.INVALID_STATUS + statusString);
         }
 
-        if (!Status.INACTIVE.equals(statusInactive)) {
-            throw new ProductInvalidStatusException(MessageConstants.STATUS_INACTIVE);
+        if (!Status.INACTIVE.equals(statusInactive) && !Status.ACTIVE.equals(statusInactive)) {
+            throw new ProductInvalidStatusException(MessageConstants.STATUS_ACTIVE_OR_INACTIVE_PRODUCT);
         }
 
         if (!productService.existsById(id)) {
             throw new ProductNotFoundException(String.format(MessageConstants.PRODUCT_NOT_FOUND, id));
         }
 
-        Product updatedStatusProduct = productService.statusProductInactive(id, statusInactive);
+        Product updatedStatusProduct = productService.updateProductStatus(id, statusInactive);
         return ResponseEntity.ok(updatedStatusProduct);
     }
 

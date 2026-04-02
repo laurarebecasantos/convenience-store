@@ -1,0 +1,125 @@
+package com.api.rest.conveniencestore.service;
+
+import com.api.rest.conveniencestore.dto.ProductDto;
+import com.api.rest.conveniencestore.dto.ProductListingDto;
+import com.api.rest.conveniencestore.dto.ProductUpdateDto;
+import com.api.rest.conveniencestore.enums.Category;
+import com.api.rest.conveniencestore.enums.Status;
+import com.api.rest.conveniencestore.model.Product;
+import com.api.rest.conveniencestore.repository.ProductRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ProductServiceTest {
+
+    @Mock
+    private ProductRepository productRepository;
+
+    @InjectMocks
+    private ProductService productService;
+
+    private Product product;
+
+    @BeforeEach
+    void setUp() {
+        product = new Product(new ProductDto("Coca-Cola", Category.BEVERAGE, 5.0, 100, LocalDate.now().plusDays(30)));
+    }
+
+    @Test
+    void registerProduct_ShouldSaveAndReturn() {
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        Product result = productService.registerProduct(
+                new ProductDto("Coca-Cola", Category.BEVERAGE, 5.0, 100, LocalDate.now().plusDays(30)));
+
+        assertThat(result).isNotNull();
+        verify(productRepository).save(any(Product.class));
+    }
+
+    @Test
+    void listProducts_ShouldReturnAllProducts() {
+        when(productRepository.findAll()).thenReturn(List.of(product));
+
+        List<ProductListingDto> result = productService.listProducts();
+
+        assertThat(result).hasSize(1);
+        verify(productRepository).findAll();
+    }
+
+    @Test
+    void listProducts_WhenEmpty_ShouldReturnEmptyList() {
+        when(productRepository.findAll()).thenReturn(List.of());
+
+        List<ProductListingDto> result = productService.listProducts();
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void updateProduct_ShouldCallSave() {
+        when(productRepository.getReferenceById(1L)).thenReturn(product);
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        Product result = productService.updateProduct(1L,
+                new ProductUpdateDto(6.0, 50, LocalDate.now().plusDays(60), Status.ACTIVE));
+
+        assertThat(result).isNotNull();
+        verify(productRepository).save(product);
+    }
+
+    @Test
+    void updateProductStatus_ToInactive_ShouldSetStatusAndSave() {
+        when(productRepository.getReferenceById(1L)).thenReturn(product);
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        Product result = productService.updateProductStatus(1L, Status.INACTIVE);
+
+        assertThat(result.getStatus()).isEqualTo(Status.INACTIVE);
+        verify(productRepository).save(product);
+    }
+
+    @Test
+    void updateProductStatus_ToActive_ShouldSetStatusAndSave() {
+        when(productRepository.getReferenceById(1L)).thenReturn(product);
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        Product result = productService.updateProductStatus(1L, Status.ACTIVE);
+
+        assertThat(result.getStatus()).isEqualTo(Status.ACTIVE);
+    }
+
+    @Test
+    void searchExpiredProducts_ShouldReturnTodayExpiredProducts() {
+        when(productRepository.findByExpirationDate(any(LocalDate.class))).thenReturn(List.of(product));
+
+        List<Product> result = productService.searchExpiredProducts();
+
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void existsByName_WhenExists_ShouldReturnTrue() {
+        when(productRepository.existsByName("Coca-Cola")).thenReturn(true);
+
+        assertThat(productService.existsByName("Coca-Cola")).isTrue();
+    }
+
+    @Test
+    void existsById_WhenExists_ShouldReturnTrue() {
+        when(productRepository.existsById(1L)).thenReturn(true);
+
+        assertThat(productService.existsById(1L)).isTrue();
+    }
+}

@@ -57,8 +57,8 @@ public class User implements UserDetails {
         this.username = data.username();
         this.password = data.password();
         this.email = data.email();
-        this.status = Status.ACTIVE;
-        this.role = Roles.USER;
+        this.status = data.status() != null ? data.status() : Status.ACTIVE;
+        this.role = data.role() != null ? data.role() : Roles.USER;
     }
 
     public void updateData(UserUpdateDto userUpdateDto, PasswordEncoder passwordEncoder) throws PasswordValidateException, UsernameValidateException {
@@ -85,7 +85,7 @@ public class User implements UserDetails {
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(() -> "ROLE: " + this.role);
+        return Collections.singletonList(() -> "ROLE_" + this.role.name());
     }
 
     @JsonIgnore

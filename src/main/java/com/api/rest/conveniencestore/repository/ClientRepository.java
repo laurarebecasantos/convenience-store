@@ -3,12 +3,13 @@ package com.api.rest.conveniencestore.repository;
 import com.api.rest.conveniencestore.model.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ClientRepository extends JpaRepository<Client, Long> {
+import java.util.Optional;
 
-    boolean existsById(Long id);
+public interface ClientRepository extends JpaRepository<Client, Long> {
 
     boolean existsByCpf(String cpf);
 
     boolean existsByName(String name);
 
+    Optional<Client> findByCpf(String cpf);
 }

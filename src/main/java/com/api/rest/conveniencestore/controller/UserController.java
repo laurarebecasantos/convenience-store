@@ -89,15 +89,15 @@ public class UserController {
             throw new UserInvalidStatusException(MessageConstants.INVALID_STATUS + statusString);
         }
 
-        if (!Status.INACTIVE.equals(statusInactive)) {
-            throw new UserInvalidStatusException(MessageConstants.STATUS_INACTIVE);
+        if (!Status.INACTIVE.equals(statusInactive) && !Status.ACTIVE.equals(statusInactive)) {
+            throw new UserInvalidStatusException(MessageConstants.STATUS_ACTIVE_OR_INACTIVE);
         }
 
         if (!userService.existsById(id)) {
             throw new UserNotFoundException(String.format(MessageConstants.USER_NOT_FOUND, id));
         }
 
-        User updatedStatusUser = userService.statusUserInactive(id, statusInactive);
+        User updatedStatusUser = userService.updateUserStatus(id, statusInactive);
         return ResponseEntity.ok(updatedStatusUser);
     }
 

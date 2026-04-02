@@ -75,10 +75,13 @@ public class UserService {
 
     @Transactional
     public User statusUserInactive(Long id, Status status) {
+        return updateUserStatus(id, status);
+    }
+
+    @Transactional
+    public User updateUserStatus(Long id, Status status) {
         User user = userRepository.getReferenceById(id);
-        if (status != null) {
-            user.setStatus(status.INACTIVE);
-        }
+        user.setStatus(status);
         return userRepository.save(user);
     }
 
@@ -86,7 +89,7 @@ public class UserService {
     public User roleUserAdmin(Long id, Roles roles) {
         User user = userRepository.getReferenceById(id);
         if (roles != null) {
-            user.setRole(roles.ADMIN);
+            user.setRole(Roles.ADMIN);
         }
         return userRepository.save(user);
     }

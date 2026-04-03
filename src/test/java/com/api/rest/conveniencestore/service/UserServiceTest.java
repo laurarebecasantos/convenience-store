@@ -99,7 +99,7 @@ class UserServiceTest {
 
     @Test
     void deleteUser_ShouldCallDelete() {
-        when(userRepository.getReferenceById(1L)).thenReturn(user);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         userService.deleteUser(1L);
 
@@ -108,7 +108,7 @@ class UserServiceTest {
 
     @Test
     void updateUserStatus_ToInactive_ShouldSetStatusAndSave() {
-        when(userRepository.getReferenceById(1L)).thenReturn(user);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         User result = userService.updateUserStatus(1L, Status.INACTIVE);
@@ -119,7 +119,7 @@ class UserServiceTest {
 
     @Test
     void updateUserStatus_ToActive_ShouldSetStatusAndSave() {
-        when(userRepository.getReferenceById(1L)).thenReturn(user);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         User result = userService.updateUserStatus(1L, Status.ACTIVE);
@@ -129,7 +129,7 @@ class UserServiceTest {
 
     @Test
     void roleUserAdmin_ShouldSetRoleAdminAndSave() {
-        when(userRepository.getReferenceById(1L)).thenReturn(user);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         User result = userService.roleUserAdmin(1L, Roles.ADMIN);

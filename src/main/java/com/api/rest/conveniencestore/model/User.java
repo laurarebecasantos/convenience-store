@@ -36,7 +36,6 @@ public class User implements UserDetails {
     private String username;
 
     @JsonIgnore
-    @Column(unique = true)
     @NotBlank(message = "Password cannot be blank")
     private String password;
 

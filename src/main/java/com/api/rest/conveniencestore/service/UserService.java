@@ -41,7 +41,7 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Transactional
     public User registerUser(UserDto userDto) {
@@ -69,7 +69,8 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
-        User user = userRepository.getReferenceById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(String.format(MessageConstants.USER_NOT_FOUND, id)));
         userRepository.delete(user);
     }
 
@@ -80,14 +81,16 @@ public class UserService {
 
     @Transactional
     public User updateUserStatus(Long id, Status status) {
-        User user = userRepository.getReferenceById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(String.format(MessageConstants.USER_NOT_FOUND, id)));
         user.setStatus(status);
         return userRepository.save(user);
     }
 
     @Transactional
     public User roleUserAdmin(Long id, Roles roles) {
-        User user = userRepository.getReferenceById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(String.format(MessageConstants.USER_NOT_FOUND, id)));
         if (roles != null) {
             user.setRole(Roles.ADMIN);
         }

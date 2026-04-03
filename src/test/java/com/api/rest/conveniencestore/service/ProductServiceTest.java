@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,7 +70,7 @@ class ProductServiceTest {
 
     @Test
     void updateProduct_ShouldCallSave() {
-        when(productRepository.getReferenceById(1L)).thenReturn(product);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
         Product result = productService.updateProduct(1L,
@@ -81,7 +82,7 @@ class ProductServiceTest {
 
     @Test
     void updateProductStatus_ToInactive_ShouldSetStatusAndSave() {
-        when(productRepository.getReferenceById(1L)).thenReturn(product);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
         Product result = productService.updateProductStatus(1L, Status.INACTIVE);
@@ -92,7 +93,7 @@ class ProductServiceTest {
 
     @Test
     void updateProductStatus_ToActive_ShouldSetStatusAndSave() {
-        when(productRepository.getReferenceById(1L)).thenReturn(product);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
         Product result = productService.updateProductStatus(1L, Status.ACTIVE);
@@ -102,7 +103,7 @@ class ProductServiceTest {
 
     @Test
     void searchExpiredProducts_ShouldReturnTodayExpiredProducts() {
-        when(productRepository.findByExpirationDate(any(LocalDate.class))).thenReturn(List.of(product));
+        when(productRepository.findByExpirationDateLessThanEqual(any(LocalDate.class))).thenReturn(List.of(product));
 
         List<Product> result = productService.searchExpiredProducts();
 

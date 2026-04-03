@@ -45,14 +45,18 @@ public class Sale implements StatusUtil {
     @Column(nullable = false, name = "date_sale")
     private LocalDateTime saleDate;
 
+    @Column(name = "seller")
+    private String seller;
 
-    public Sale(SaleDto saleDto, double totalValue, String description, int quantity, LocalDateTime saleDate) {
+
+    public Sale(SaleDto saleDto, double totalValue, String description, int quantity, LocalDateTime saleDate, String seller) {
         this.description = description;
         this.quantity = quantity;
         this.totalValue = totalValue;
         this.paymentMethod = saleDto.paymentMethod();
         this.status = Status.APPROVED;
         this.saleDate = LocalDateTime.now();
+        this.seller = seller;
     }
 
     public void setStatus(Status status) {

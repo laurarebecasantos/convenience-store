@@ -33,11 +33,10 @@ public class SaleHelper {
         return total;
     }
 
-    public String generateSaleDescription(SaleDto saleDto, Client client) throws ProductNotFoundException {
+    public String generateSaleDescription(SaleDto saleDto, Client client, String seller) throws ProductNotFoundException {
         StringBuilder description = new StringBuilder();
 
-
-        description.append("CPF: ").append(client.getCpf()).append(" Produtos: ");
+        description.append("Vendedor: ").append(seller).append(" | CPF: ").append(client.getCpf()).append(" | Produtos: ");
 
         for (int i = 0; i < saleDto.productIds().size(); i++) {
             Long productId = saleDto.productIds().get(i);

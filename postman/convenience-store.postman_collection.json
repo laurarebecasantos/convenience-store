@@ -80,7 +80,22 @@
           }
         },
         {
-          "name": "Listar usuários",
+          "name": "Meu perfil (usuário autenticado)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            },
+            "description": "Retorna os dados do usuário autenticado (lidos do token JWT): id, username, email, role e status."
+          }
+        },
+        {
+          "name": "Listar usuários ativos",
           "request": {
             "method": "GET",
             "header": [
@@ -91,7 +106,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["users"]
             },
-            "description": "Lista todos os usuários. Requer autenticação."
+            "description": "Lista todos os usuários com status ACTIVE. Requer autenticação."
           }
         },
         {
@@ -316,7 +331,29 @@
               "host": ["{{baseUrl}}"],
               "path": ["products", "duedate"]
             },
-            "description": "Lista produtos vencidos ou próximos do vencimento. Requer autenticação."
+            "description": "Lista produtos com data de vencimento igual ou anterior a hoje. Requer autenticação."
+          }
+        },
+        {
+          "name": "Listar produtos próximos de vencer",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/expiring?days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "expiring"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7",
+                  "description": "Número de dias a partir de hoje (padrão: 7). Ex: ?days=30 para produtos vencendo em até 30 dias."
+                }
+              ]
+            },
+            "description": "Lista produtos cuja data de vencimento está entre amanhã e hoje + N dias. O parâmetro 'days' é opcional (padrão: 7). Requer autenticação."
           }
         }
       ]
@@ -341,7 +378,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["sales"]
             },
-            "description": "Registra uma nova venda. Requer autenticação.\n\n- productIds: lista de IDs dos produtos\n- quantity: lista de quantidades (mesma ordem dos IDs)\n- paymentMethod: CASH | CREDIT | DEBIT\n- clientCpf: CPF do cliente já cadastrado (formato 000.000.000-00)"
+            "description": "Registra uma nova venda. Requer autenticação.\n\n- productIds: lista de IDs dos produtos\n- quantity: lista de quantidades (mesma ordem dos IDs)\n- paymentMethod: CASH | CREDIT | DEBIT\n- clientCpf: CPF do cliente já cadastrado (formato 000.000.000-00)\n\nO campo 'seller' é preenchido automaticamente com o username do usuário autenticado e retornado na listagem de vendas."
           }
         },
         {

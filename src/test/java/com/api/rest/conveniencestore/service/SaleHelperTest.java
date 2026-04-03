@@ -72,7 +72,7 @@ class SaleHelperTest {
         SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09");
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 
-        String description = saleHelper.generateSaleDescription(dto, client);
+        String description = saleHelper.generateSaleDescription(dto, client, "testuser");
 
         assertThat(description).contains("123.456.789-09");
         assertThat(description).contains("Coca-Cola");
@@ -118,7 +118,7 @@ class SaleHelperTest {
 
     @Test
     void validatePaymentMethod_WhenNull_ShouldThrow() {
-        Sale sale = new Sale(new SaleDto(List.of(), List.of(), PaymentMethod.CASH, "cpf"), 0, "", 0, LocalDateTime.now());
+        Sale sale = new Sale(new SaleDto(List.of(), List.of(), PaymentMethod.CASH, "cpf"), 0, "", 0, LocalDateTime.now(), "testuser");
 
         assertThatThrownBy(() -> saleHelper.validatePaymentMethod(sale, null))
                 .isInstanceOf(SaleNotValidPaymentMethodException.class);
@@ -126,7 +126,7 @@ class SaleHelperTest {
 
     @Test
     void validatePaymentMethod_WhenMatches_ShouldNotThrow() {
-        Sale sale = new Sale(new SaleDto(List.of(), List.of(), PaymentMethod.CASH, "cpf"), 0, "", 0, LocalDateTime.now());
+        Sale sale = new Sale(new SaleDto(List.of(), List.of(), PaymentMethod.CASH, "cpf"), 0, "", 0, LocalDateTime.now(), "testuser");
 
         assertThatCode(() -> saleHelper.validatePaymentMethod(sale, PaymentMethod.CASH))
                 .doesNotThrowAnyException();

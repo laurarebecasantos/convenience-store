@@ -18,6 +18,8 @@ public record SaleListingDto(
 
         int quantity,
 
+        String seller,
+
         String description
 ) {
     public SaleListingDto(Sale sale) {
@@ -27,6 +29,7 @@ public record SaleListingDto(
                 sale.getTotalValue(),
                 sale.getPaymentMethod(),
                 sale.getQuantity(),
+                sale.getSeller(),
                 sale.getDescription()
         );
     }

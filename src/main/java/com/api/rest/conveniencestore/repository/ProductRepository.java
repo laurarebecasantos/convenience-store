@@ -16,5 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsById(Long id);
 
-    List<Product> findByExpirationDate(LocalDate expirationDate);
+    List<Product> findByExpirationDateLessThanEqual(LocalDate expirationDate);
+
+    List<Product> findByExpirationDateBetween(LocalDate start, LocalDate end);
 }

@@ -107,6 +107,7 @@ As migrações são gerenciadas pelo Flyway e executadas automaticamente:
 | V4 | Criação da tabela `sales_products` (pivot) |
 | V5 | Constraint de unicidade no nome do produto |
 | V6 | Criação da tabela `clients` |
+| V7 | Coluna `seller` na tabela `sales` |
 
 ---
 
@@ -143,14 +144,15 @@ A API usa **JWT (Bearer Token)**. O fluxo é:
 
 ### Usuários `/users`
 
-| Método | Endpoint | Descrição | Auth |
-|--------|----------|-----------|------|
-| POST | `/users` | Cadastra novo usuário | Não |
-| GET | `/users` | Lista usuários ativos | Sim |
-| PUT | `/users/{id}` | Atualiza username/senha | Sim |
-| DELETE | `/users/{id}` | Remove usuário | Sim |
-| PATCH | `/users/{id}/status` | Altera status (`INACTIVE`) | Sim |
-| PATCH | `/users/{id}/roles` | Altera role (`ADMIN`) | Sim |
+| Método | Endpoint | Descrição | Auth | Role |
+|--------|----------|-----------|------|------|
+| POST | `/users` | Cadastra novo usuário | Não | - |
+| GET | `/users/me` | Retorna o usuário autenticado | Sim | qualquer |
+| GET | `/users` | Lista usuários ativos | Sim | qualquer |
+| PUT | `/users/{id}` | Atualiza username/senha | Sim | qualquer |
+| DELETE | `/users/{id}` | Remove usuário | Sim | ADMIN |
+| PATCH | `/users/{id}/status` | Altera status (`ACTIVE`/`INACTIVE`) | Sim | ADMIN |
+| PATCH | `/users/{id}/roles` | Promove a `ADMIN` | Sim | ADMIN |
 
 **Roles disponíveis:** `USER`, `ADMIN`  
 **Status disponíveis:** `ACTIVE`, `INACTIVE`
@@ -175,13 +177,16 @@ A API usa **JWT (Bearer Token)**. O fluxo é:
 
 ### Produtos `/products`
 
-| Método | Endpoint | Descrição | Auth |
-|--------|----------|-----------|------|
-| POST | `/products` | Cadastra produto | Sim |
-| GET | `/products` | Lista produtos | Sim |
-| PUT | `/products/{id}` | Atualiza produto | Sim |
-| PATCH | `/products/{id}/status` | Altera status (`INACTIVE`) | Sim |
-| GET | `/products/duedate` | Lista produtos vencidos/a vencer | Sim |
+| Método | Endpoint | Descrição | Auth | Role |
+|--------|----------|-----------|------|------|
+| POST | `/products` | Cadastra produto | Sim | ADMIN |
+| GET | `/products` | Lista todos os produtos | Sim | qualquer |
+| PUT | `/products/{id}` | Atualiza produto | Sim | ADMIN |
+| PATCH | `/products/{id}/status` | Altera status (`ACTIVE`/`INACTIVE`) | Sim | ADMIN |
+| GET | `/products/duedate` | Lista produtos vencidos (até hoje) | Sim | qualquer |
+| GET | `/products/expiring?days=7` | Lista produtos próximos de vencer | Sim | qualquer |
+
+> O parâmetro `days` é opcional (padrão: 7). Retorna produtos cuja data de vencimento está entre amanhã e `hoje + days`.
 
 **Categorias:** `FUEL`, `FOOD`, `BEVERAGE`, `CLEANING_PRODUCTS`  
 **Status:** `REGISTERED`, `ACTIVE`, `INACTIVE`
@@ -190,11 +195,13 @@ A API usa **JWT (Bearer Token)**. O fluxo é:
 
 ### Vendas `/sales`
 
-| Método | Endpoint | Descrição | Auth |
-|--------|----------|-----------|------|
-| POST | `/sales` | Registra venda | Sim |
-| GET | `/sales?paymentMethod=CASH` | Lista vendas por forma de pagamento | Sim |
-| PATCH | `/sales/{id}/status` | Cancela venda (`CANCELLED`) | Sim |
+| Método | Endpoint | Descrição | Auth | Role |
+|--------|----------|-----------|------|------|
+| POST | `/sales` | Registra venda | Sim | qualquer |
+| GET | `/sales?paymentMethod=CASH` | Lista vendas por forma de pagamento | Sim | qualquer |
+| PATCH | `/sales/{id}/status` | Cancela venda (`CANCELLED`) | Sim | ADMIN |
+
+> Ao registrar uma venda, o campo `seller` é preenchido automaticamente com o username do usuário autenticado e aparece na listagem para controle de bonificações.
 
 **Formas de pagamento:** `CASH`, `CREDIT`, `DEBIT`  
 **Status:** `APPROVED`, `CANCELLED`

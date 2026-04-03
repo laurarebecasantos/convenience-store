@@ -45,7 +45,7 @@ public class SaleController {
         try {
             payment = PaymentMethod.valueOf(paymentMethod.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new SaleListingNullException(MessageConstants.INVALID_PAYMENT_METHOD + paymentMethod);
+            throw new SaleNotValidPaymentMethodException(MessageConstants.INVALID_PAYMENT_METHOD + paymentMethod);
         }
         List<SaleListingDto> sales = saleService.listSalesByPaymentMethod(payment);
         return ResponseEntity.ok(sales);

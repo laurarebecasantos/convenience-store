@@ -7,7 +7,7 @@ import com.api.rest.conveniencestore.enums.Category;
 import com.api.rest.conveniencestore.enums.Status;
 import com.api.rest.conveniencestore.model.Product;
 import com.api.rest.conveniencestore.repository.ProductRepository;
-import com.api.rest.conveniencestore.security.JwtAuthenticationFilter;
+import com.api.rest.conveniencestore.repository.UserRepository;
 import com.api.rest.conveniencestore.service.ProductService;
 import com.api.rest.conveniencestore.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,7 +49,7 @@ class ProductControllerTest {
     private TokenService tokenService;
 
     @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private UserRepository userRepository;
 
     private Product product;
 
@@ -99,11 +99,13 @@ class ProductControllerTest {
 
     @Test
     @WithMockUser
-    void list_WhenNoProducts_ShouldReturn404() throws Exception {
+    void list_WhenNoProducts_ShouldReturnEmptyList() throws Exception {
         when(productService.listProducts()).thenReturn(List.of());
 
         mockMvc.perform(get("/products"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test

@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -52,13 +53,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UserListingDto> me(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(new UserListingDto(user));
+    }
+
     @GetMapping
-    public ResponseEntity<List<UserListingDto>> list() throws UserListingNullException {
-        var returnList = userService.listUsers();
-        if (returnList.isEmpty()) {
-            throw new UserListingNullException(MessageConstants.NO_USERS_FOUND);
-        }
-        return ResponseEntity.ok(returnList);
+    public ResponseEntity<List<UserListingDto>> list() {
+        return ResponseEntity.ok(userService.listUsers());
     }
 
     @PutMapping("/{id}")

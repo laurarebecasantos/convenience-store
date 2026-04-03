@@ -47,6 +47,9 @@ public class Product implements StatusUtil {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Version
+    private Long version;
+
     public Product(ProductDto data) {
         this.name = data.name();
         this.category = data.category();
@@ -81,5 +84,9 @@ public class Product implements StatusUtil {
 
     public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public boolean isExpired() {
+        return this.expirationDate != null && this.expirationDate.isBefore(LocalDate.now());
     }
 }

@@ -11,16 +11,21 @@ import com.api.rest.conveniencestore.exceptions.ClientCpfNotFoundException;
 import com.api.rest.conveniencestore.model.Client;
 import com.api.rest.conveniencestore.model.Product;
 import com.api.rest.conveniencestore.model.Sale;
+import com.api.rest.conveniencestore.model.User;
+import com.api.rest.conveniencestore.model.SaleItem;
 import com.api.rest.conveniencestore.repository.ClientRepository;
 import com.api.rest.conveniencestore.repository.ProductRepository;
+import com.api.rest.conveniencestore.repository.SaleItemRepository;
 import com.api.rest.conveniencestore.repository.SaleRepository;
-import com.api.rest.conveniencestore.utils.DateUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,7 +49,7 @@ class SaleServiceTest {
     private ClientRepository clientRepository;
 
     @Mock
-    private DateUtil dateUtil;
+    private SaleItemRepository saleItemRepository;
 
     @InjectMocks
     private SaleService saleService;
@@ -60,11 +65,19 @@ class SaleServiceTest {
         product = new Product(new ProductDto("Coca-Cola", Category.BEVERAGE, 5.0, 100, LocalDate.now().plusDays(30)));
         client = new Client(new ClientDto("Maria Silva", "123.456.789-09"));
         sale = new Sale(new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09"),
-                10.0, "desc", 2, LocalDateTime.now());
+                10.0, "desc", 2, LocalDateTime.now(), "testuser");
     }
 
     @Test
     void registerSale_ShouldCreateSaleAndDecrementStock() throws Exception {
+        User mockUser = mock(User.class);
+        when(mockUser.getUsername()).thenReturn("testuser");
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(mockUser);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
         SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09");
 
         when(clientRepository.findByCpf("123.456.789-09")).thenReturn(Optional.of(client));
@@ -72,12 +85,13 @@ class SaleServiceTest {
         when(productRepository.existsById(1L)).thenReturn(true);
         when(productRepository.save(any(Product.class))).thenReturn(product);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
+        when(saleItemRepository.save(any(SaleItem.class))).thenReturn(null);
 
         Sale result = saleService.registerSale(dto);
 
         assertThat(result).isNotNull();
-        verify(productRepository).save(any(Product.class));  // stock decremented
-        verify(saleRepository).save(any(Sale.class));
+        verify(productRepository).save(any(Product.class));
+        verify(saleRepository, atLeastOnce()).save(any(Sale.class));
     }
 
     @Test
@@ -109,7 +123,8 @@ class SaleServiceTest {
 
     @Test
     void statusSaleCanceled_ShouldSetCancelledStatus() {
-        when(saleRepository.getReferenceById(1L)).thenReturn(sale);
+        when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
+        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
 
         Sale result = saleService.statusSaleCanceled(1L, Status.CANCELLED);

@@ -4,7 +4,7 @@ import com.api.rest.conveniencestore.dto.ClientDto;
 import com.api.rest.conveniencestore.dto.ClientListingDto;
 import com.api.rest.conveniencestore.model.Client;
 import com.api.rest.conveniencestore.repository.ClientRepository;
-import com.api.rest.conveniencestore.security.JwtAuthenticationFilter;
+import com.api.rest.conveniencestore.repository.UserRepository;
 import com.api.rest.conveniencestore.service.ClientService;
 import com.api.rest.conveniencestore.service.TokenService;
 import com.api.rest.conveniencestore.validations.UserValidator;
@@ -12,8 +12,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.api.rest.conveniencestore.security.ConfigurationSecurity;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ClientController.class)
+@Import(ConfigurationSecurity.class)
 class ClientControllerTest {
 
     @Autowired
@@ -48,7 +51,7 @@ class ClientControllerTest {
     private TokenService tokenService;
 
     @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private UserRepository userRepository;
 
     private Client client;
 

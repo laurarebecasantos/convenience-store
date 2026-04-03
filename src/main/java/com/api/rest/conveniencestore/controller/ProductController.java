@@ -9,7 +9,6 @@ import com.api.rest.conveniencestore.exceptions.ProductNotFoundException;
 import com.api.rest.conveniencestore.exceptions.UserListingNullException;
 import com.api.rest.conveniencestore.exceptions.UserRegistrationException;
 import com.api.rest.conveniencestore.model.Product;
-import com.api.rest.conveniencestore.repository.ProductRepository;
 import com.api.rest.conveniencestore.service.ProductService;
 import com.api.rest.conveniencestore.utils.MessageConstants;
 import jakarta.transaction.Transactional;
@@ -28,13 +27,6 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    public boolean existsById(Long id){
-        return  productRepository.existsById(id);
-    }
-
     @PostMapping
     @Transactional
     public ResponseEntity<Product> register(@Valid @RequestBody ProductDto productDto) throws UserRegistrationException {
@@ -46,12 +38,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductListingDto>> list() throws UserListingNullException {
-        var returnProducts = productService.listProducts();
-        if (returnProducts.isEmpty()) {
-            throw new UserListingNullException(MessageConstants.NO_PRODUCTS_FOUND);
-        }
-        return ResponseEntity.ok(returnProducts);
+    public ResponseEntity<List<ProductListingDto>> list() {
+        return ResponseEntity.ok(productService.listProducts());
     }
 
     @PutMapping("/{id}")
@@ -95,5 +83,14 @@ public class ProductController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(productsExpiring);
+    }
+
+    @GetMapping("/expiring")
+    public ResponseEntity<List<Product>> listProductsNearExpiration(@RequestParam(defaultValue = "7") int days) {
+        List<Product> products = productService.searchProductsNearExpiration(days);
+        if (products.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(products);
     }
 }

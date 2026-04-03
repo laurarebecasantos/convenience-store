@@ -6,7 +6,7 @@ import com.api.rest.conveniencestore.enums.PaymentMethod;
 import com.api.rest.conveniencestore.enums.Status;
 import com.api.rest.conveniencestore.model.Sale;
 import com.api.rest.conveniencestore.repository.SaleRepository;
-import com.api.rest.conveniencestore.security.JwtAuthenticationFilter;
+import com.api.rest.conveniencestore.repository.UserRepository;
 import com.api.rest.conveniencestore.service.SaleService;
 import com.api.rest.conveniencestore.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,14 +48,14 @@ class SaleControllerTest {
     private TokenService tokenService;
 
     @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private UserRepository userRepository;
 
     private Sale sale;
 
     @BeforeEach
     void setUp() {
         SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09");
-        sale = new Sale(dto, 10.0, "desc", 2, LocalDateTime.now());
+        sale = new Sale(dto, 10.0, "desc", 2, LocalDateTime.now(), "testuser");
     }
 
     @Test

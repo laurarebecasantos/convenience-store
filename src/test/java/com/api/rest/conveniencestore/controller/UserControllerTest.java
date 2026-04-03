@@ -6,7 +6,7 @@ import com.api.rest.conveniencestore.dto.UserUpdateDto;
 import com.api.rest.conveniencestore.enums.Roles;
 import com.api.rest.conveniencestore.enums.Status;
 import com.api.rest.conveniencestore.model.User;
-import com.api.rest.conveniencestore.security.JwtAuthenticationFilter;
+import com.api.rest.conveniencestore.repository.UserRepository;
 import com.api.rest.conveniencestore.service.TokenService;
 import com.api.rest.conveniencestore.service.UserService;
 import com.api.rest.conveniencestore.validations.PasswordValidator;
@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import com.api.rest.conveniencestore.security.ConfigurationSecurity;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,6 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
+@Import(ConfigurationSecurity.class)
 class UserControllerTest {
 
     @Autowired
@@ -52,7 +55,7 @@ class UserControllerTest {
     private TokenService tokenService;
 
     @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private UserRepository userRepository;
 
     private User user;
 
@@ -99,11 +102,13 @@ class UserControllerTest {
 
     @Test
     @WithMockUser
-    void list_WhenNoUsers_ShouldReturn404() throws Exception {
+    void list_WhenNoUsers_ShouldReturnEmptyList() throws Exception {
         when(userService.listUsers()).thenReturn(List.of());
 
         mockMvc.perform(get("/users"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test

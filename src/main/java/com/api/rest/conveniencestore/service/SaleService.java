@@ -8,12 +8,15 @@ import com.api.rest.conveniencestore.exceptions.*;
 import com.api.rest.conveniencestore.model.Client;
 import com.api.rest.conveniencestore.model.Product;
 import com.api.rest.conveniencestore.model.Sale;
+import com.api.rest.conveniencestore.model.User;
+import com.api.rest.conveniencestore.model.SaleItem;
 import com.api.rest.conveniencestore.repository.ClientRepository;
 import com.api.rest.conveniencestore.repository.ProductRepository;
+import com.api.rest.conveniencestore.repository.SaleItemRepository;
 import com.api.rest.conveniencestore.repository.SaleRepository;
-import com.api.rest.conveniencestore.utils.DateUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +36,7 @@ public class SaleService {
     private ClientRepository clientRepository;
 
     @Autowired
-    private DateUtil dateUtil;
+    private SaleItemRepository saleItemRepository;
 
     private SaleHelper saleHelper;
 
@@ -53,27 +56,32 @@ public class SaleService {
                 .orElseThrow(() -> new ClientCpfNotFoundException(
                         com.api.rest.conveniencestore.utils.MessageConstants.CLIENT_NOT_FOUND_BY_CPF + saleDto.clientCpf()));
 
+        User authenticatedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String seller = authenticatedUser.getUsername();
+
         double totalValue = saleHelper.calculateTotalValue(saleDto);
-        String description = saleHelper.generateSaleDescription(saleDto, client);
+        String description = saleHelper.generateSaleDescription(saleDto, client, seller);
         int totalQuantity = saleDto.quantity().stream().mapToInt(Integer::intValue).sum();
 
         LocalDateTime saleDate = LocalDateTime.now();
-        DateUtil.formatDate(saleDate);
 
-        Sale sale = new Sale(saleDto, totalValue, description, totalQuantity, saleDate);
+        Sale sale = new Sale(saleDto, totalValue, description, totalQuantity, saleDate, seller);
 
         saleHelper.validatePaymentMethod(sale, sale.getPaymentMethod());
+
+        Sale savedSale = saleRepository.save(sale);
 
         for (int i = 0; i < saleDto.productIds().size(); i++) {
             Long productId = saleDto.productIds().get(i);
             Integer quantity = saleDto.quantity().get(i);
 
-            Product product;
-            product = saleHelper.validationProduct(productId, quantity);
+            Product product = saleHelper.validationProduct(productId, quantity);
             product.setStockQuantity(product.getStockQuantity() - quantity);
             productRepository.save(product);
+
+            saleItemRepository.save(new SaleItem(savedSale, productId, quantity));
         }
-        return saleRepository.save(sale);
+        return savedSale;
     }
 
     public List<SaleListingDto> listSalesByPaymentMethod(PaymentMethod payment) {
@@ -85,7 +93,16 @@ public class SaleService {
 
     @Transactional
     public Sale statusSaleCanceled(Long id, Status status) {
-        Sale sale = saleRepository.getReferenceById(id);
+        Sale sale = saleRepository.findById(id)
+                .orElseThrow(() -> new SaleListingNullException(com.api.rest.conveniencestore.utils.MessageConstants.SALE_NOT_FOUND));
+
+        saleItemRepository.findBySaleId(id).forEach(item -> {
+            productRepository.findById(item.getProductId()).ifPresent(product -> {
+                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                productRepository.save(product);
+            });
+        });
+
         sale.setStatus(Status.CANCELLED);
         return saleRepository.save(sale);
     }

@@ -11,7 +11,6 @@ import com.api.rest.conveniencestore.enums.Status;
 import com.api.rest.conveniencestore.utils.MessageConstants;
 import com.api.rest.conveniencestore.validations.PasswordValidator;
 import com.api.rest.conveniencestore.validations.UserValidator;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,8 +40,7 @@ public class UserController {
     private UserValidator userValidator;
 
     @PostMapping
-    @Transactional
-    public ResponseEntity<User> register(@Valid @RequestBody UserDto userDto) throws PasswordValidateException, UserEmailNotFoundException, UsernameValidateException {
+public ResponseEntity<User> register(@Valid @RequestBody UserDto userDto) throws PasswordValidateException, UserEmailNotFoundException, UsernameValidateException {
         userValidator.validateUsername(userDto.username());
 
         if (userService.existsByEmail(userDto.email())) {
@@ -66,15 +64,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @Transactional
-    public ResponseEntity<User> update( @PathVariable Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) throws UserNotFoundException, PasswordValidateException, UsernameValidateException {
+public ResponseEntity<User> update( @PathVariable Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) throws UserNotFoundException, PasswordValidateException, UsernameValidateException {
         User updateUser = userService.updateUser(id, userUpdateDto);
         return ResponseEntity.ok(updateUser);
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
-    public ResponseEntity<Void> delete(@PathVariable Long id) throws UserNotFoundException {
+public ResponseEntity<Void> delete(@PathVariable Long id) throws UserNotFoundException {
         if (!userService.existsById(id)) {
             throw new UserNotFoundException(String.format(MessageConstants.USER_NOT_FOUND, id));
         }
@@ -83,8 +79,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/status")
-    @Transactional
-    public ResponseEntity<User> status( @PathVariable Long id, @Valid @RequestBody Map<String, String> statusRequest) throws UserInvalidStatusException, UserNotFoundException{
+public ResponseEntity<User> status( @PathVariable Long id, @Valid @RequestBody Map<String, String> statusRequest) throws UserInvalidStatusException, UserNotFoundException{
         String statusString = statusRequest.get("status");
         Status statusInactive;
         try {
@@ -106,8 +101,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/roles")
-    @Transactional
-    public ResponseEntity<User> roles( @PathVariable Long id, @Valid @RequestBody Map<String, String> rolesRequest) throws UserInvalidRolesException, UserNotFoundException{
+public ResponseEntity<User> roles( @PathVariable Long id, @Valid @RequestBody Map<String, String> rolesRequest) throws UserInvalidRolesException, UserNotFoundException{
         String rolesString = rolesRequest.get("roles");
         Roles rolesAdmin;
         try {

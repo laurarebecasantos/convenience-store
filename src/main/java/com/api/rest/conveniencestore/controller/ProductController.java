@@ -11,7 +11,6 @@ import com.api.rest.conveniencestore.exceptions.UserRegistrationException;
 import com.api.rest.conveniencestore.model.Product;
 import com.api.rest.conveniencestore.service.ProductService;
 import com.api.rest.conveniencestore.utils.MessageConstants;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,8 +29,7 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping
-    @Transactional
-    public ResponseEntity<Product> register(@Valid @RequestBody ProductDto productDto) throws UserRegistrationException {
+public ResponseEntity<Product> register(@Valid @RequestBody ProductDto productDto) throws UserRegistrationException {
         if (productService.existsByName(productDto.name())) {
             throw new UserRegistrationException(MessageConstants.PRODUCT_ALREADY_EXISTS + productDto.name());
         }
@@ -45,8 +43,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    @Transactional
-    public ResponseEntity<Product> update(@PathVariable Long id, @Valid @RequestBody ProductUpdateDto updateDto) throws ProductNotFoundException {
+public ResponseEntity<Product> update(@PathVariable Long id, @Valid @RequestBody ProductUpdateDto updateDto) throws ProductNotFoundException {
         if (!productService.existsById(id)) {
             throw new ProductNotFoundException((String.format(MessageConstants.PRODUCT_NOT_FOUND, id)));
         }
@@ -55,8 +52,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/status")
-    @Transactional
-    public ResponseEntity<Product> status(@PathVariable Long id, @Valid @RequestBody Map<String, String> statusRequest) throws ProductNotFoundException, ProductInvalidStatusException {
+public ResponseEntity<Product> status(@PathVariable Long id, @Valid @RequestBody Map<String, String> statusRequest) throws ProductNotFoundException, ProductInvalidStatusException {
         String statusString = statusRequest.get("status");
         Status statusInactive;
         try {

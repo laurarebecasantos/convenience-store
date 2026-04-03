@@ -9,7 +9,6 @@ import com.api.rest.conveniencestore.model.Sale;
 import com.api.rest.conveniencestore.repository.SaleRepository;
 import com.api.rest.conveniencestore.service.SaleService;
 import com.api.rest.conveniencestore.utils.MessageConstants;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,8 +30,7 @@ public class SaleController {
     private SaleRepository saleRepository;
 
     @PostMapping
-    @Transactional
-    public ResponseEntity<Sale> register(@Valid @RequestBody SaleDto saleDto) throws ProductNotFoundException, ProductInactiveException, ProductInsufficientStockException, SaleNotValidPaymentMethodException, CpfValidateException {
+public ResponseEntity<Sale> register(@Valid @RequestBody SaleDto saleDto) throws ProductNotFoundException, ProductInactiveException, ProductInsufficientStockException, SaleNotValidPaymentMethodException, CpfValidateException {
         Sale savedSale = saleService.registerSale(saleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedSale);
     }
@@ -54,8 +52,7 @@ public class SaleController {
 
 
     @PatchMapping("/{id}/status")
-    @Transactional
-    public ResponseEntity<Sale> status(@Valid @PathVariable Long id, @RequestBody Map<String, String> statusRequest) throws SaleInvalidStatusException, SaleListingNullException {
+public ResponseEntity<Sale> status(@Valid @PathVariable Long id, @RequestBody Map<String, String> statusRequest) throws SaleInvalidStatusException, SaleListingNullException {
         String statusString = statusRequest.get("status");
         Status statusCanceled;
         try {

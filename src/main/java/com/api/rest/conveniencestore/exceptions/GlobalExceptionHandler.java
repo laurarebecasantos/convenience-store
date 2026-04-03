@@ -61,17 +61,7 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "INVALID_NAME", except.getMessage());
     }
 
-    @ExceptionHandler(ProductRegistrationException.class)
-    public ResponseEntity<ErrorResponse> productRegistrationException(ProductRegistrationException except) {
-        return build(HttpStatus.CONFLICT, "CONFLICT", except.getMessage());
-    }
-
-    @ExceptionHandler(ProductListingNullException.class)
-    public ResponseEntity<ErrorResponse> productListingNullException(ProductListingNullException except) {
-        return build(HttpStatus.NOT_FOUND, "NOT_FOUND", except.getMessage());
-    }
-
-    @ExceptionHandler(ProductNotFoundException.class)
+@ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ErrorResponse> productNotFoundException(ProductNotFoundException except) {
         return build(HttpStatus.NOT_FOUND, "NOT_FOUND", except.getMessage());
     }
@@ -121,27 +111,12 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, "NOT_FOUND", except.getMessage());
     }
 
-    @ExceptionHandler(ClientAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> clientAlreadyExistsException(ClientAlreadyExistsException except) {
-        return build(HttpStatus.CONFLICT, "CONFLICT", except.getMessage());
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
+@ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> authenticationException(AuthenticationException except) {
         return build(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", except.getMessage());
     }
 
-    @ExceptionHandler(AutheticationInvalidException.class)
-    public ResponseEntity<ErrorResponse> autheticationInvalidException(AutheticationInvalidException except) {
-        return build(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", except.getMessage());
-    }
-
-    @ExceptionHandler(TokenGenerationException.class)
-    public ResponseEntity<ErrorResponse> tokenGenerationException(TokenGenerationException except) {
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "TOKEN_ERROR", except.getMessage());
-    }
-
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+@ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException except) {
         return build(HttpStatus.BAD_REQUEST, "INVALID_PARAMETER",
                 "Valor inválido para o parâmetro '" + except.getName() + "': '" + except.getValue() + "'. Era esperado um número inteiro.");

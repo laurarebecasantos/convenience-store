@@ -10,7 +10,6 @@ import com.api.rest.conveniencestore.service.ClientService;
 import com.api.rest.conveniencestore.utils.MessageConstants;
 import com.api.rest.conveniencestore.validations.CpfValidator;
 import com.api.rest.conveniencestore.validations.UserValidator;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,8 +32,7 @@ public class ClientController {
     UserValidator userValidator;
 
     @PostMapping
-    @Transactional
-    public ResponseEntity<Client> register(@Valid @RequestBody ClientDto clientDto) throws CpfValidateException, NameValidateException {
+public ResponseEntity<Client> register(@Valid @RequestBody ClientDto clientDto) throws CpfValidateException, NameValidateException {
         userValidator.validateNameClient(clientDto.name());
 
         if (clientRepository.existsByCpf(clientDto.cpf())) {

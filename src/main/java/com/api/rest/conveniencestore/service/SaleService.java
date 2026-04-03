@@ -55,6 +55,10 @@ public class SaleService {
     @Transactional
     public Sale registerSale(SaleDto saleDto) throws ProductNotFoundException, ProductInactiveException, ProductInsufficientStockException, SaleNotValidPaymentMethodException {
 
+        if (saleDto.productIds().size() != saleDto.quantity().size()) {
+            throw new IllegalArgumentException(com.api.rest.conveniencestore.utils.MessageConstants.SALE_LISTS_SIZE_MISMATCH);
+        }
+
         Client client = clientRepository.findByCpf(saleDto.clientCpf())
                 .orElseThrow(() -> new ClientCpfNotFoundException(
                         com.api.rest.conveniencestore.utils.MessageConstants.CLIENT_NOT_FOUND_BY_CPF + saleDto.clientCpf()));
@@ -89,7 +93,12 @@ public class SaleService {
             Integer quantity = saleDto.quantity().get(i);
 
             Product product = saleHelper.validationProduct(productId, quantity);
-            product.setStockQuantity(product.getStockQuantity() - quantity);
+            int newStock = product.getStockQuantity() - quantity;
+            if (newStock < 0) {
+                throw new ProductInsufficientStockException(
+                        com.api.rest.conveniencestore.utils.MessageConstants.STOCK_CANNOT_BE_NEGATIVE + product.getName());
+            }
+            product.setStockQuantity(newStock);
             productRepository.save(product);
 
             saleItemRepository.save(new SaleItem(savedSale, productId, quantity));

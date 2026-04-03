@@ -167,6 +167,11 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Dados inválidos: " + fields);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> illegalArgumentException(IllegalArgumentException except) {
+        return build(HttpStatus.BAD_REQUEST, "INVALID_ARGUMENT", except.getMessage());
+    }
+
     @ExceptionHandler(LoyaltyException.class)
     public ResponseEntity<ErrorResponse> loyaltyException(LoyaltyException except) {
         return build(HttpStatus.BAD_REQUEST, "LOYALTY_ERROR", except.getMessage());

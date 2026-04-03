@@ -109,6 +109,14 @@ class SaleServiceTest {
     }
 
     @Test
+    void registerSale_WhenListsSizeMismatch_ShouldThrow() {
+        SaleDto dto = new SaleDto(List.of(1L, 2L), List.of(1), PaymentMethod.CASH, "123.456.789-09", null);
+
+        assertThatThrownBy(() -> saleService.registerSale(dto))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void listSalesByPaymentMethod_ShouldReturnFilteredSales() {
         when(saleRepository.findByPaymentMethod(PaymentMethod.CASH)).thenReturn(List.of(sale));
 

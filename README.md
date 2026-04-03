@@ -111,6 +111,7 @@ As migrações são gerenciadas pelo Flyway e executadas automaticamente:
 | V8 | Criação da tabela `sale_items` (itens por venda, usada para restaurar estoque no cancelamento) |
 | V9 | Coluna `version` na tabela `products` (controle de concorrência otimista) |
 | V10 | Programa de fidelidade: `points_balance` (clients), `points_earned`/`points_used`/`discount` (sales), tabelas `loyalty_points` e `loyalty_transactions` |
+| V11 | Constraint `CHECK (stock_quantity >= 0)` em products e índices de performance |
 
 ---
 

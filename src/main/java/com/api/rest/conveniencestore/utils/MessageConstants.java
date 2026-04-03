@@ -31,4 +31,6 @@ public class MessageConstants {
     public static final String INVALID_EXPIRATION_DATE = "A data de validade não pode ser anterior a hoje.";
     public static final String PRODUCT_EXPIRED_UPDATE = "Produto vencido não pode ser alterado.";
     public static final String PRODUCT_INACTIVE_UPDATE = "Produto inativo não pode ser alterado.";
+    public static final String SALE_LISTS_SIZE_MISMATCH = "A lista de produtos e a lista de quantidades devem ter o mesmo tamanho.";
+    public static final String STOCK_CANNOT_BE_NEGATIVE = "Estoque não pode ficar negativo para o produto: ";
 }

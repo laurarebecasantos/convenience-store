@@ -10,6 +10,9 @@ API REST para gerenciamento de uma conveniência, desenvolvida com Spring Boot. 
 - Spring Data JPA + Hibernate
 - MySQL 8
 - Flyway (migrações de banco)
+- Spring Actuator (health, info, metrics)
+- Swagger/OpenAPI (springdoc-openapi 2.6.0)
+- Docker + Docker Compose
 - Lombok
 - Maven
 
@@ -19,7 +22,7 @@ API REST para gerenciamento de uma conveniência, desenvolvida com Spring Boot. 
 
 - Java 17+
 - Maven 3.8+ (ou use o wrapper `./mvnw` incluso)
-- MySQL 8 rodando localmente
+- MySQL 8 rodando localmente (ou Docker)
 
 ---
 
@@ -35,10 +38,13 @@ CREATE DATABASE conveniencestore_db;
 
 O projeto usa variáveis de ambiente para credenciais sensíveis. Você pode defini-las no sistema ou simplesmente deixar os valores padrão (não recomendado em produção):
 
-| Variável     | Descrição                    | Padrão       |
-|--------------|------------------------------|--------------|
-| `DB_SECRET`  | Senha do MySQL               | `root1234`   |
-| `JWT_SECRET` | Chave secreta para JWT       | `123456789`  |
+| Variável                 | Descrição                    | Padrão                                              |
+|--------------------------|------------------------------|------------------------------------------------------|
+| `DB_URL`                 | URL JDBC do MySQL            | `jdbc:mysql://localhost:3306/conveniencestore_db`    |
+| `DB_USERNAME`            | Usuário do MySQL             | `root`                                               |
+| `DB_SECRET`              | Senha do MySQL               | `root1234`                                           |
+| `JWT_SECRET`             | Chave secreta para JWT       | `123456789`                                          |
+| `SPRING_PROFILES_ACTIVE` | Perfil ativo (`dev`/`prod`)  | `dev`                                                |
 
 Para configurar no terminal (Linux/Mac):
 ```bash
@@ -74,6 +80,43 @@ Ajuste `username` e `url` conforme sua instalação do MySQL.
 O Flyway executará automaticamente as migrações e criará todas as tabelas na primeira inicialização.
 
 A API ficará disponível em: `http://localhost:8080`
+
+### 5. Executar com Docker (alternativa)
+
+```bash
+docker compose up -d
+```
+
+Sobe o MySQL e a aplicação automaticamente. O perfil `prod` é ativado por padrão no container.
+
+---
+
+## Profiles
+
+| Perfil | Descrição |
+|--------|-----------|
+| `dev`  | SQL visível no console, logs de segurança em DEBUG |
+| `prod` | Logs reduzidos (WARN), sem SQL no console |
+
+---
+
+## Swagger / OpenAPI
+
+Com a aplicação rodando, acesse:
+- **Swagger UI:** `http://localhost:8080/swagger-ui.html`
+- **OpenAPI JSON:** `http://localhost:8080/v3/api-docs`
+
+Use o botão "Authorize" no Swagger UI para informar o Bearer Token.
+
+---
+
+## Actuator
+
+| Endpoint | Descrição |
+|----------|-----------|
+| `GET /actuator/health` | Status da aplicação |
+| `GET /actuator/info` | Informações gerais |
+| `GET /actuator/metrics` | Métricas disponíveis |
 
 ---
 
@@ -127,6 +170,20 @@ A API usa **JWT (Bearer Token)**. O fluxo é:
    ```
    Authorization: Bearer <seu_token>
    ```
+
+---
+
+## Paginação
+
+Todos os endpoints de listagem (`GET`) suportam paginação via query params:
+
+| Parâmetro | Descrição | Exemplo |
+|-----------|-----------|---------|
+| `page`    | Número da página (começa em 0) | `?page=0` |
+| `size`    | Itens por página | `?size=10` |
+| `sort`    | Ordenação | `?sort=name,asc` |
+
+A resposta inclui metadados: `totalElements`, `totalPages`, `size`, `number`, além do array `content` com os dados.
 
 ---
 
@@ -308,7 +365,8 @@ Este projeto foi desenvolvido com objetivo de aprender e consolidar conhecimento
 6. Registro de vendas
 7. Controle de estoque
 8. Fidelidade e pontuação de clientes
-9. Relatórios e estatísticas *(em desenvolvimento)*
+9. Swagger/OpenAPI, Actuator, paginação, profiles e Docker
+10. Relatórios e estatísticas *(em desenvolvimento)*
 
 Acompanhe o progresso no [Trello do projeto](https://trello.com/b/zd8yvutP/projeto-api-rest-usuario).
 

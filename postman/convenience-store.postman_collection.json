@@ -102,11 +102,15 @@
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/users",
+              "raw": "{{baseUrl}}/users?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["users"]
+              "path": ["users"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Número da página (começa em 0)" },
+                { "key": "size", "value": "10", "description": "Itens por página" }
+              ]
             },
-            "description": "Lista todos os usuários com status ACTIVE. Requer autenticação."
+            "description": "Lista todos os usuários com status ACTIVE. Suporta paginação via page/size/sort. Requer autenticação."
           }
         },
         {
@@ -217,11 +221,15 @@
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/clients",
+              "raw": "{{baseUrl}}/clients?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["clients"]
+              "path": ["clients"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Número da página (começa em 0)" },
+                { "key": "size", "value": "10", "description": "Itens por página" }
+              ]
             },
-            "description": "Lista todos os clientes cadastrados. Requer autenticação."
+            "description": "Lista todos os clientes cadastrados. Suporta paginação via page/size/sort. Requer autenticação."
           }
         },
         {
@@ -272,11 +280,15 @@
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/products",
+              "raw": "{{baseUrl}}/products?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["products"]
+              "path": ["products"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Número da página (começa em 0)" },
+                { "key": "size", "value": "10", "description": "Itens por página" }
+              ]
             },
-            "description": "Lista todos os produtos cadastrados. Requer autenticação."
+            "description": "Lista todos os produtos cadastrados. Suporta paginação via page/size/sort. Requer autenticação."
           }
         },
         {
@@ -389,18 +401,16 @@
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/sales?paymentMethod=CASH",
+              "raw": "{{baseUrl}}/sales?paymentMethod=CASH&page=0&size=10",
               "host": ["{{baseUrl}}"],
               "path": ["sales"],
               "query": [
-                {
-                  "key": "paymentMethod",
-                  "value": "CASH",
-                  "description": "Valores: CASH | CREDIT | DEBIT"
-                }
+                { "key": "paymentMethod", "value": "CASH", "description": "Valores: CASH | CREDIT | DEBIT" },
+                { "key": "page", "value": "0", "description": "Número da página (começa em 0)" },
+                { "key": "size", "value": "10", "description": "Itens por página" }
               ]
             },
-            "description": "Lista vendas filtradas por forma de pagamento. Requer autenticação.\n\nValores: CASH | CREDIT | DEBIT"
+            "description": "Lista vendas filtradas por forma de pagamento. Suporta paginação via page/size/sort. Requer autenticação.\n\nValores: CASH | CREDIT | DEBIT"
           }
         },
         {
@@ -476,11 +486,44 @@
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/loyalty/clients/1/transactions",
+              "raw": "{{baseUrl}}/loyalty/clients/1/transactions?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["loyalty", "clients", "1", "transactions"]
+              "path": ["loyalty", "clients", "1", "transactions"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Número da página (começa em 0)" },
+                { "key": "size", "value": "10", "description": "Itens por página" }
+              ]
             },
             "description": "Retorna o extrato de pontos de fidelidade do cliente. Troque o '1' pelo ID real. Requer role ADMIN.\n\nTipos de transação:\n- EARN: pontos acumulados\n- REDEEM: pontos resgatados\n- EXPIRE: pontos expirados (após 90 dias)\n- CANCEL: pontos estornados por cancelamento de venda"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Actuator",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Verifica o status da aplicação. Não requer autenticação."
+          }
+        },
+        {
+          "name": "Métricas disponíveis",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/actuator/metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "metrics"]
+            },
+            "description": "Lista todas as métricas disponíveis. Não requer autenticação."
           }
         }
       ]

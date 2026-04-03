@@ -12,11 +12,12 @@ import com.api.rest.conveniencestore.utils.MessageConstants;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,7 +38,7 @@ public class SaleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SaleListingDto>> listSalesByPaymentMethod(@Valid @RequestParam String paymentMethod) throws SaleListingNullException {
+    public ResponseEntity<Page<SaleListingDto>> listSalesByPaymentMethod(@Valid @RequestParam String paymentMethod, Pageable pageable) throws SaleListingNullException {
         if (paymentMethod == null || paymentMethod.trim().isEmpty()) {
             throw new SaleListingNullException(MessageConstants.PAYMENT_METHOD_EMPTY);
         }
@@ -47,7 +48,7 @@ public class SaleController {
         } catch (IllegalArgumentException e) {
             throw new SaleNotValidPaymentMethodException(MessageConstants.INVALID_PAYMENT_METHOD + paymentMethod);
         }
-        List<SaleListingDto> sales = saleService.listSalesByPaymentMethod(payment);
+        Page<SaleListingDto> sales = saleService.listSalesByPaymentMethod(payment, pageable);
         return ResponseEntity.ok(sales);
     }
 

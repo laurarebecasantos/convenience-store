@@ -11,12 +11,13 @@ import com.api.rest.conveniencestore.model.Product;
 import com.api.rest.conveniencestore.repository.ProductRepository;
 import com.api.rest.conveniencestore.utils.MessageConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -46,11 +47,9 @@ public class ProductService {
         return productRepository.save(new Product(productDto));
     }
 
-    public List<ProductListingDto> listProducts() {
-        return productRepository.findAll()
-                .stream()
-                .map(ProductListingDto::new)
-                .collect(Collectors.toList());
+    public Page<ProductListingDto> listProducts(Pageable pageable) {
+        return productRepository.findAll(pageable)
+                .map(ProductListingDto::new);
     }
 
     @Transactional

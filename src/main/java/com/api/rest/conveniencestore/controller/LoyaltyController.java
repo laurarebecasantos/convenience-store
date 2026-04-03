@@ -8,10 +8,10 @@ import com.api.rest.conveniencestore.service.ClientService;
 import com.api.rest.conveniencestore.service.LoyaltyService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/loyalty")
@@ -31,7 +31,7 @@ public class LoyaltyController {
     }
 
     @GetMapping("/clients/{id}/transactions")
-    public ResponseEntity<List<LoyaltyTransactionDto>> getTransactions(@PathVariable Long id) {
-        return ResponseEntity.ok(loyaltyService.getTransactions(id));
+    public ResponseEntity<Page<LoyaltyTransactionDto>> getTransactions(@PathVariable Long id, Pageable pageable) {
+        return ResponseEntity.ok(loyaltyService.getTransactions(id, pageable));
     }
 }

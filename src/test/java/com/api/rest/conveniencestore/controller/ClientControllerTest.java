@@ -20,6 +20,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -93,17 +97,19 @@ class ClientControllerTest {
     @WithMockUser
     void list_WhenClientsExist_ShouldReturn200() throws Exception {
         ClientListingDto dto = new ClientListingDto(client);
-        when(clientService.listClients()).thenReturn(List.of(dto));
+        Page<ClientListingDto> page = new PageImpl<>(List.of(dto));
+        when(clientService.listClients(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/clients"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Maria Silva"));
+                .andExpect(jsonPath("$.content[0].name").value("Maria Silva"));
     }
 
     @Test
     @WithMockUser
     void list_WhenNoClients_ShouldReturn204() throws Exception {
-        when(clientService.listClients()).thenReturn(List.of());
+        Page<ClientListingDto> page = new PageImpl<>(List.of());
+        when(clientService.listClients(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/clients"))
                 .andExpect(status().isNoContent());

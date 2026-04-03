@@ -16,6 +16,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -53,21 +58,23 @@ class ProductServiceTest {
 
     @Test
     void listProducts_ShouldReturnAllProducts() {
-        when(productRepository.findAll()).thenReturn(List.of(product));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(productRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(product)));
 
-        List<ProductListingDto> result = productService.listProducts();
+        Page<ProductListingDto> result = productService.listProducts(pageable);
 
-        assertThat(result).hasSize(1);
-        verify(productRepository).findAll();
+        assertThat(result.getContent()).hasSize(1);
+        verify(productRepository).findAll(pageable);
     }
 
     @Test
     void listProducts_WhenEmpty_ShouldReturnEmptyList() {
-        when(productRepository.findAll()).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 10);
+        when(productRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of()));
 
-        List<ProductListingDto> result = productService.listProducts();
+        Page<ProductListingDto> result = productService.listProducts(pageable);
 
-        assertThat(result).isEmpty();
+        assertThat(result.getContent()).isEmpty();
     }
 
     @Test

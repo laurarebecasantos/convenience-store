@@ -19,6 +19,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +80,8 @@ class SaleControllerTest {
     @WithMockUser
     void listByPaymentMethod_WhenSalesExist_ShouldReturn200() throws Exception {
         SaleListingDto listingDto = new SaleListingDto(sale);
-        when(saleService.listSalesByPaymentMethod(PaymentMethod.CASH)).thenReturn(List.of(listingDto));
+        Page<SaleListingDto> page = new PageImpl<>(List.of(listingDto));
+        when(saleService.listSalesByPaymentMethod(eq(PaymentMethod.CASH), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/sales").param("paymentMethod", "CASH"))
                 .andExpect(status().isOk());

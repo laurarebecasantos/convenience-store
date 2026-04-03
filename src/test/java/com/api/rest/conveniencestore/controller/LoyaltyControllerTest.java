@@ -21,6 +21,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -94,13 +98,14 @@ class LoyaltyControllerTest {
     @WithMockUser(roles = "ADMIN")
     void getTransactions_ShouldReturn200WithList() throws Exception {
         LoyaltyTransactionDto tx = new LoyaltyTransactionDto(1L, 100, TransactionType.EARN, 1L, LocalDateTime.now());
+        Page<LoyaltyTransactionDto> page = new PageImpl<>(List.of(tx));
 
-        when(loyaltyService.getTransactions(1L)).thenReturn(List.of(tx));
+        when(loyaltyService.getTransactions(eq(1L), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/loyalty/clients/1/transactions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].points").value(100))
-                .andExpect(jsonPath("$[0].type").value("EARN"));
+                .andExpect(jsonPath("$.content[0].points").value(100))
+                .andExpect(jsonPath("$.content[0].type").value("EARN"));
     }
 
     @Test

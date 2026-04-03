@@ -14,6 +14,8 @@ import com.api.rest.conveniencestore.utils.MessageConstants;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +40,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductListingDto>> list() {
-        return ResponseEntity.ok(productService.listProducts());
+    public ResponseEntity<Page<ProductListingDto>> list(Pageable pageable) {
+        return ResponseEntity.ok(productService.listProducts(pageable));
     }
 
     @PutMapping("/{id}")

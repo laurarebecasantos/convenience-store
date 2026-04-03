@@ -23,6 +23,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Map;
 
@@ -93,22 +97,24 @@ class UserControllerTest {
     @WithMockUser
     void list_WhenAuthenticated_ShouldReturn200() throws Exception {
         UserListingDto dto = new UserListingDto(user);
-        when(userService.listUsers()).thenReturn(List.of(dto));
+        Page<UserListingDto> page = new PageImpl<>(List.of(dto));
+        when(userService.listUsers(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].username").value("testuser"));
+                .andExpect(jsonPath("$.content[0].username").value("testuser"));
     }
 
     @Test
     @WithMockUser
     void list_WhenNoUsers_ShouldReturnEmptyList() throws Exception {
-        when(userService.listUsers()).thenReturn(List.of());
+        Page<UserListingDto> page = new PageImpl<>(List.of());
+        when(userService.listUsers(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test

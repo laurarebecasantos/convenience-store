@@ -12,12 +12,13 @@ import com.api.rest.conveniencestore.repository.LoyaltyPointRepository;
 import com.api.rest.conveniencestore.repository.LoyaltyTransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class LoyaltyService {
@@ -126,11 +127,9 @@ public class LoyaltyService {
         return new LoyaltySimulateResponseDto(effectivePoints, discount, finalAmount, pointsAfterPurchase);
     }
 
-    public List<LoyaltyTransactionDto> getTransactions(Long clientId) {
-        return loyaltyTransactionRepository.findByClientIdOrderByCreatedAtDesc(clientId)
-                .stream()
-                .map(LoyaltyTransactionDto::new)
-                .collect(Collectors.toList());
+    public Page<LoyaltyTransactionDto> getTransactions(Long clientId, Pageable pageable) {
+        return loyaltyTransactionRepository.findByClientIdOrderByCreatedAtDesc(clientId, pageable)
+                .map(LoyaltyTransactionDto::new);
     }
 
     @Scheduled(cron = "0 0 2 * * *")

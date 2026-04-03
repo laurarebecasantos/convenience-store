@@ -20,6 +20,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -90,22 +94,24 @@ class ProductControllerTest {
     @Test
     @WithMockUser
     void list_WhenProductsExist_ShouldReturn200() throws Exception {
-        when(productService.listProducts()).thenReturn(List.of(new ProductListingDto(product)));
+        Page<ProductListingDto> page = new PageImpl<>(List.of(new ProductListingDto(product)));
+        when(productService.listProducts(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/products"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Coca-Cola"));
+                .andExpect(jsonPath("$.content[0].name").value("Coca-Cola"));
     }
 
     @Test
     @WithMockUser
     void list_WhenNoProducts_ShouldReturnEmptyList() throws Exception {
-        when(productService.listProducts()).thenReturn(List.of());
+        Page<ProductListingDto> page = new PageImpl<>(List.of());
+        when(productService.listProducts(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/products"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test

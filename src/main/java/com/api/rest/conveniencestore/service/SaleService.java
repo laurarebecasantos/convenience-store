@@ -16,11 +16,11 @@ import com.api.rest.conveniencestore.repository.SaleItemRepository;
 import com.api.rest.conveniencestore.repository.SaleRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -114,11 +114,9 @@ public class SaleService {
         return savedSale;
     }
 
-    public List<SaleListingDto> listSalesByPaymentMethod(PaymentMethod payment) {
-        return saleRepository.findByPaymentMethod(payment)
-                .stream()
-                .map(SaleListingDto::new)
-                .collect(Collectors.toList());
+    public Page<SaleListingDto> listSalesByPaymentMethod(PaymentMethod payment, Pageable pageable) {
+        return saleRepository.findByPaymentMethod(payment, pageable)
+                .map(SaleListingDto::new);
     }
 
     @Transactional

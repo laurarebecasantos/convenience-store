@@ -12,6 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -47,20 +52,22 @@ class ClientServiceTest {
 
     @Test
     void listClients_ShouldReturnAll() {
-        when(clientRepository.findAll()).thenReturn(List.of(client));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(clientRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(client)));
 
-        List<ClientListingDto> result = clientService.listClients();
+        Page<ClientListingDto> result = clientService.listClients(pageable);
 
-        assertThat(result).hasSize(1);
+        assertThat(result.getContent()).hasSize(1);
     }
 
     @Test
     void listClients_WhenEmpty_ShouldReturnEmptyList() {
-        when(clientRepository.findAll()).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 10);
+        when(clientRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of()));
 
-        List<ClientListingDto> result = clientService.listClients();
+        Page<ClientListingDto> result = clientService.listClients(pageable);
 
-        assertThat(result).isEmpty();
+        assertThat(result.getContent()).isEmpty();
     }
 
     @Test

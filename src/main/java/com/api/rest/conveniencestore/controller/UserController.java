@@ -14,12 +14,13 @@ import com.api.rest.conveniencestore.validations.UserValidator;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 import java.util.Map;
 
 
@@ -60,8 +61,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserListingDto>> list() {
-        return ResponseEntity.ok(userService.listUsers());
+    public ResponseEntity<Page<UserListingDto>> list(Pageable pageable) {
+        return ResponseEntity.ok(userService.listUsers(pageable));
     }
 
     @PutMapping("/{id}")

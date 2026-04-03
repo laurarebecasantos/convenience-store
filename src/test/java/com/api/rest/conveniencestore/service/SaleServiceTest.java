@@ -28,6 +28,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -118,20 +123,22 @@ class SaleServiceTest {
 
     @Test
     void listSalesByPaymentMethod_ShouldReturnFilteredSales() {
-        when(saleRepository.findByPaymentMethod(PaymentMethod.CASH)).thenReturn(List.of(sale));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(saleRepository.findByPaymentMethod(PaymentMethod.CASH, pageable)).thenReturn(new PageImpl<>(List.of(sale)));
 
-        List<SaleListingDto> result = saleService.listSalesByPaymentMethod(PaymentMethod.CASH);
+        Page<SaleListingDto> result = saleService.listSalesByPaymentMethod(PaymentMethod.CASH, pageable);
 
-        assertThat(result).hasSize(1);
+        assertThat(result.getContent()).hasSize(1);
     }
 
     @Test
     void listSalesByPaymentMethod_WhenNone_ShouldReturnEmpty() {
-        when(saleRepository.findByPaymentMethod(PaymentMethod.DEBIT)).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 10);
+        when(saleRepository.findByPaymentMethod(PaymentMethod.DEBIT, pageable)).thenReturn(new PageImpl<>(List.of()));
 
-        List<SaleListingDto> result = saleService.listSalesByPaymentMethod(PaymentMethod.DEBIT);
+        Page<SaleListingDto> result = saleService.listSalesByPaymentMethod(PaymentMethod.DEBIT, pageable);
 
-        assertThat(result).isEmpty();
+        assertThat(result.getContent()).isEmpty();
     }
 
     @Test

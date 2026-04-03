@@ -18,6 +18,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -182,13 +187,15 @@ class LoyaltyServiceTest {
 
     @Test
     void getTransactions_ShouldReturnMappedDtos() {
+        Pageable pageable = PageRequest.of(0, 10);
         LoyaltyTransaction tx = new LoyaltyTransaction(1L, 100, TransactionType.EARN, 1L);
-        when(loyaltyTransactionRepository.findByClientIdOrderByCreatedAtDesc(1L)).thenReturn(List.of(tx));
+        when(loyaltyTransactionRepository.findByClientIdOrderByCreatedAtDesc(1L, pageable))
+                .thenReturn(new PageImpl<>(List.of(tx)));
 
-        List<LoyaltyTransactionDto> result = loyaltyService.getTransactions(1L);
+        Page<LoyaltyTransactionDto> result = loyaltyService.getTransactions(1L, pageable);
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).type()).isEqualTo(TransactionType.EARN);
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).type()).isEqualTo(TransactionType.EARN);
     }
 
     // === expirePoints ===

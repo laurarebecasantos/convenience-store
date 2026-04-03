@@ -8,10 +8,9 @@ import com.api.rest.conveniencestore.repository.ClientRepository;
 import com.api.rest.conveniencestore.utils.MessageConstants;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientService {
@@ -36,11 +35,9 @@ public class ClientService {
         return clientRepository.save(new Client(clientDto));
     }
 
-    public List<ClientListingDto> listClients() {
-        return clientRepository.findAll()
-                .stream()
-                .map(ClientListingDto::new)
-                .collect(Collectors.toList());
+    public Page<ClientListingDto> listClients(Pageable pageable) {
+        return clientRepository.findAll(pageable)
+                .map(ClientListingDto::new);
     }
 
     public Client findById(Long id) {

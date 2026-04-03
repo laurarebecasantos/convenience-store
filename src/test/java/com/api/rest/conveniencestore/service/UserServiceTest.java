@@ -16,6 +16,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -60,21 +65,23 @@ class UserServiceTest {
 
     @Test
     void listUsers_ShouldReturnOnlyActiveUsers() {
-        when(userRepository.findByStatus(Status.ACTIVE)).thenReturn(List.of(user));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(userRepository.findByStatus(Status.ACTIVE, pageable)).thenReturn(new PageImpl<>(List.of(user)));
 
-        List<UserListingDto> result = userService.listUsers();
+        Page<UserListingDto> result = userService.listUsers(pageable);
 
-        assertThat(result).hasSize(1);
-        verify(userRepository).findByStatus(Status.ACTIVE);
+        assertThat(result.getContent()).hasSize(1);
+        verify(userRepository).findByStatus(Status.ACTIVE, pageable);
     }
 
     @Test
     void listUsers_WhenNoActiveUsers_ShouldReturnEmptyList() {
-        when(userRepository.findByStatus(Status.ACTIVE)).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 10);
+        when(userRepository.findByStatus(Status.ACTIVE, pageable)).thenReturn(new PageImpl<>(List.of()));
 
-        List<UserListingDto> result = userService.listUsers();
+        Page<UserListingDto> result = userService.listUsers(pageable);
 
-        assertThat(result).isEmpty();
+        assertThat(result.getContent()).isEmpty();
     }
 
     @Test

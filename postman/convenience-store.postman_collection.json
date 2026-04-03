@@ -371,14 +371,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"productIds\": [1, 2],\n  \"quantity\": [2, 1],\n  \"paymentMethod\": \"CASH\",\n  \"clientCpf\": \"123.456.789-09\"\n}"
+              "raw": "{\n  \"productIds\": [1, 2],\n  \"quantity\": [2, 1],\n  \"paymentMethod\": \"CASH\",\n  \"clientCpf\": \"123.456.789-09\",\n  \"pointsToUse\": null\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/sales",
               "host": ["{{baseUrl}}"],
               "path": ["sales"]
             },
-            "description": "Registra uma nova venda. Requer autenticação.\n\n- productIds: lista de IDs dos produtos\n- quantity: lista de quantidades (mesma ordem dos IDs)\n- paymentMethod: CASH | CREDIT | DEBIT\n- clientCpf: CPF do cliente já cadastrado (formato 000.000.000-00)\n\nO campo 'seller' é preenchido automaticamente com o username do usuário autenticado e retornado na listagem de vendas."
+            "description": "Registra uma nova venda. Requer autenticação.\n\n- productIds: lista de IDs dos produtos\n- quantity: lista de quantidades (mesma ordem dos IDs)\n- paymentMethod: CASH | CREDIT | DEBIT\n- clientCpf: CPF do cliente já cadastrado (formato 000.000.000-00)\n- pointsToUse: (opcional) pontos de fidelidade para resgate como desconto. Múltiplo de 100, mínimo 100. 100 pontos = R$1,00. Máximo 50% do valor da compra.\n\nO campo 'seller' é preenchido automaticamente com o username do usuário autenticado. A resposta inclui pointsEarned, pointsUsed e discount."
           }
         },
         {
@@ -420,7 +420,67 @@
               "host": ["{{baseUrl}}"],
               "path": ["sales", "1", "status"]
             },
-            "description": "Cancela uma venda. Troque o '1' pelo ID real. Requer role ADMIN.\n\nValor aceito: CANCELLED"
+            "description": "Cancela uma venda. Troque o '1' pelo ID real. Requer role ADMIN.\n\nValor aceito: CANCELLED\n\nAo cancelar, o estoque dos produtos é restaurado e os pontos de fidelidade são estornados (saldo pode ficar negativo)."
+          }
+        },
+        {
+          "name": "Registrar venda com resgate de pontos",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productIds\": [1],\n  \"quantity\": [2],\n  \"paymentMethod\": \"CASH\",\n  \"clientCpf\": \"123.456.789-09\",\n  \"pointsToUse\": 500\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"]
+            },
+            "description": "Registra uma venda resgatando pontos de fidelidade. Requer autenticação.\n\n- pointsToUse: 500 pontos = R$5,00 de desconto\n- Mínimo: 100 pontos | Máximo: 50% do valor da compra\n- Conversão: 100 pontos = R$1,00\n\nA resposta retorna os campos pointsEarned, pointsUsed e discount."
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Fidelidade",
+      "item": [
+        {
+          "name": "Simular resgate de pontos",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"purchaseAmount\": 200.00,\n  \"pointsToUse\": 500\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/loyalty/simulate",
+              "host": ["{{baseUrl}}"],
+              "path": ["loyalty", "simulate"]
+            },
+            "description": "Simula o resgate de pontos sem efetuar a venda. Requer autenticação.\n\nRetorna:\n- pointsToUse: pontos efetivamente utilizados (ajustado ao limite de 50%)\n- discount: valor do desconto em R$\n- finalAmount: valor final da compra\n- pointsAfterPurchase: saldo previsto após a compra"
+          }
+        },
+        {
+          "name": "Extrato de pontos do cliente",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/loyalty/clients/1/transactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["loyalty", "clients", "1", "transactions"]
+            },
+            "description": "Retorna o extrato de pontos de fidelidade do cliente. Troque o '1' pelo ID real. Requer role ADMIN.\n\nTipos de transação:\n- EARN: pontos acumulados\n- REDEEM: pontos resgatados\n- EXPIRE: pontos expirados (após 90 dias)\n- CANCEL: pontos estornados por cancelamento de venda"
           }
         }
       ]

@@ -110,6 +110,7 @@ As migrações são gerenciadas pelo Flyway e executadas automaticamente:
 | V7 | Coluna `seller` na tabela `sales` |
 | V8 | Criação da tabela `sale_items` (itens por venda, usada para restaurar estoque no cancelamento) |
 | V9 | Coluna `version` na tabela `products` (controle de concorrência otimista) |
+| V10 | Programa de fidelidade: `points_balance` (clients), `points_earned`/`points_used`/`discount` (sales), tabelas `loyalty_points` e `loyalty_transactions` |
 
 ---
 
@@ -163,11 +164,15 @@ A API usa **JWT (Bearer Token)**. O fluxo é:
 
 ### Clientes `/clients`
 
-| Método | Endpoint | Descrição | Auth |
-|--------|----------|-----------|------|
-| POST | `/clients` | Cadastra novo cliente | Sim |
+| Método | Endpoint | Descrição | Auth | Role |
+|--------|----------|-----------|------|------|
+| POST | `/clients` | Cadastra novo cliente | Sim | qualquer |
+| GET | `/clients` | Lista todos os clientes | Sim | qualquer |
+| GET | `/clients/{id}` | Busca cliente por ID (inclui saldo de pontos) | Sim | qualquer |
 
-**Body:**
+> O campo `pointsBalance` é retornado no `GET /clients/{id}` e representa o saldo atual de pontos de fidelidade do cliente.
+
+**Body (POST):**
 ```json
 {
   "name": "Nome do Cliente",
@@ -203,10 +208,59 @@ A API usa **JWT (Bearer Token)**. O fluxo é:
 | GET | `/sales?paymentMethod=CASH` | Lista vendas por forma de pagamento | Sim | qualquer |
 | PATCH | `/sales/{id}/status` | Cancela venda (`CANCELLED`) | Sim | ADMIN |
 
-> Ao registrar uma venda, o campo `seller` é preenchido automaticamente com o username do usuário autenticado e aparece na listagem para controle de bonificações.
+> Ao registrar uma venda, o campo `seller` é preenchido automaticamente com o username do usuário autenticado. O campo opcional `pointsToUse` permite que o cliente resgate pontos de fidelidade como desconto. A listagem retorna `pointsEarned`, `pointsUsed` e `discount`.
+
+**Body (POST):**
+```json
+{
+  "productIds": [1, 2],
+  "quantity": [2, 1],
+  "paymentMethod": "CASH",
+  "clientCpf": "123.456.789-09",
+  "pointsToUse": 500
+}
+```
+
+> O campo `pointsToUse` é opcional. Quando informado, deve ser múltiplo de 100 (mínimo 100). A conversão é 100 pontos = R$1,00 de desconto, limitado a 50% do valor da compra.
 
 **Formas de pagamento:** `CASH`, `CREDIT`, `DEBIT`  
 **Status:** `APPROVED`, `CANCELLED`
+
+---
+
+### Fidelidade `/loyalty`
+
+| Método | Endpoint | Descrição | Auth | Role |
+|--------|----------|-----------|------|------|
+| POST | `/loyalty/simulate` | Simula resgate de pontos | Sim | qualquer |
+| GET | `/loyalty/clients/{id}/transactions` | Extrato de pontos do cliente | Sim | ADMIN |
+
+**Regras do programa:**
+- **Acúmulo:** 1 ponto a cada R$1,00 gasto (arredondamento para baixo, sobre valor final após desconto)
+- **Resgate:** 100 pontos = R$1,00 de desconto | mínimo: 100 pontos | máximo: 50% do valor da compra
+- **Expiração:** pontos expiram após 90 dias da aquisição (por lote/compra)
+- **Cancelamento:** pontos são estornados — saldo pode ficar negativo até ser compensado
+- **Consumo:** FIFO — lotes mais antigos são consumidos primeiro
+- **Auditoria:** todas as operações são registradas com tipo (`EARN`, `REDEEM`, `EXPIRE`, `CANCEL`)
+
+**Body (POST /loyalty/simulate):**
+```json
+{
+  "clientId": 1,
+  "purchaseAmount": 200.00,
+  "pointsToUse": 500
+}
+```
+
+**Resposta:**
+```json
+{
+  "pointsToUse": 500,
+  "discount": 5.00,
+  "finalAmount": 195.00,
+  "pointsAfterPurchase": 895
+}
+```
 
 ---
 
@@ -250,7 +304,7 @@ Este projeto foi desenvolvido com objetivo de aprender e consolidar conhecimento
 5. Cadastro e gestão de produtos
 6. Registro de vendas
 7. Controle de estoque
-8. Fidelidade e pontuação de clientes *(em desenvolvimento)*
+8. Fidelidade e pontuação de clientes
 9. Relatórios e estatísticas *(em desenvolvimento)*
 
 Acompanhe o progresso no [Trello do projeto](https://trello.com/b/zd8yvutP/projeto-api-rest-usuario).

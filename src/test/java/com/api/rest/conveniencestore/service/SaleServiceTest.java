@@ -90,6 +90,7 @@ class SaleServiceTest {
         Sale result = saleService.registerSale(dto);
 
         assertThat(result).isNotNull();
+        assertThat(product.getStockQuantity()).isEqualTo(98); // 100 - 2 vendidos
         verify(productRepository).save(any(Product.class));
         verify(saleRepository, atLeastOnce()).save(any(Sale.class));
     }

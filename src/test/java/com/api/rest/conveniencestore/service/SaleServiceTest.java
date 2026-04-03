@@ -122,14 +122,20 @@ class SaleServiceTest {
     }
 
     @Test
-    void statusSaleCanceled_ShouldSetCancelledStatus() {
+    void statusSaleCanceled_ShouldSetCancelledStatusAndRestoreStock() {
+        SaleItem saleItem = new SaleItem(sale, 1L, 2);
+
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
-        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of());
+        when(saleItemRepository.findBySaleId(1L)).thenReturn(List.of(saleItem));
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.save(any(Product.class))).thenReturn(product);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
 
         Sale result = saleService.statusSaleCanceled(1L, Status.CANCELLED);
 
         assertThat(result.getStatus()).isEqualTo(Status.CANCELLED);
+        assertThat(product.getStockQuantity()).isEqualTo(102); // 100 + 2 restaurados
+        verify(productRepository).save(product);
         verify(saleRepository).save(sale);
     }
 

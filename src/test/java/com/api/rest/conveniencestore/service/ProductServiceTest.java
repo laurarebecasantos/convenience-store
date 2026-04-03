@@ -5,6 +5,8 @@ import com.api.rest.conveniencestore.dto.ProductListingDto;
 import com.api.rest.conveniencestore.dto.ProductUpdateDto;
 import com.api.rest.conveniencestore.enums.Category;
 import com.api.rest.conveniencestore.enums.Status;
+import com.api.rest.conveniencestore.exceptions.ProductDateInvalidException;
+import com.api.rest.conveniencestore.exceptions.ProductInactiveException;
 import com.api.rest.conveniencestore.model.Product;
 import com.api.rest.conveniencestore.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,6 +110,47 @@ class ProductServiceTest {
         List<Product> result = productService.searchExpiredProducts();
 
         assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void registerProduct_WhenPriceIsZero_ShouldThrow() {
+        assertThatThrownBy(() -> productService.registerProduct(
+                new ProductDto("Produto", Category.BEVERAGE, 0.0, 10, LocalDate.now().plusDays(10))))
+                .isInstanceOf(ProductDateInvalidException.class);
+    }
+
+    @Test
+    void registerProduct_WhenStockIsNegative_ShouldThrow() {
+        assertThatThrownBy(() -> productService.registerProduct(
+                new ProductDto("Produto", Category.BEVERAGE, 5.0, -1, LocalDate.now().plusDays(10))))
+                .isInstanceOf(ProductDateInvalidException.class);
+    }
+
+    @Test
+    void registerProduct_WhenExpirationDateIsInPast_ShouldThrow() {
+        assertThatThrownBy(() -> productService.registerProduct(
+                new ProductDto("Produto", Category.BEVERAGE, 5.0, 10, LocalDate.now().minusDays(1))))
+                .isInstanceOf(ProductDateInvalidException.class);
+    }
+
+    @Test
+    void updateProduct_WhenProductIsExpired_ShouldThrow() {
+        product.setExpirationDate(LocalDate.now().minusDays(1));
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productService.updateProduct(1L,
+                new ProductUpdateDto(6.0, 50, LocalDate.now().plusDays(60), Status.ACTIVE)))
+                .isInstanceOf(ProductDateInvalidException.class);
+    }
+
+    @Test
+    void updateProduct_WhenProductIsInactive_ShouldThrow() {
+        product.setStatus(Status.INACTIVE);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productService.updateProduct(1L,
+                new ProductUpdateDto(6.0, 50, LocalDate.now().plusDays(60), Status.ACTIVE)))
+                .isInstanceOf(ProductInactiveException.class);
     }
 
     @Test

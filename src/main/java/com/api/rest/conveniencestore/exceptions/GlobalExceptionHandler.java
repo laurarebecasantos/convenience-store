@@ -1,9 +1,11 @@
 package com.api.rest.conveniencestore.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -163,6 +165,12 @@ public class GlobalExceptionHandler {
                 .map(f -> f.getField() + ": " + f.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         return build(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Dados inválidos: " + fields);
+    }
+
+    @ExceptionHandler({OptimisticLockException.class, ObjectOptimisticLockingFailureException.class})
+    public ResponseEntity<ErrorResponse> handleOptimisticLock() {
+        return build(HttpStatus.CONFLICT, "OPTIMISTIC_LOCK_CONFLICT",
+                "O registro foi modificado por outra operação simultaneamente. Tente novamente.");
     }
 
     @ExceptionHandler(Exception.class)

@@ -45,6 +45,10 @@ public class Sale implements StatusUtil {
     @Column(nullable = false, name = "date_sale")
     private LocalDateTime saleDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id")
+    private Client client;
+
     @Column(name = "seller")
     private String seller;
 
@@ -84,5 +88,9 @@ public class Sale implements StatusUtil {
 
     public void setDiscount(double discount) {
         this.discount = discount;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 }

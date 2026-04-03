@@ -81,6 +81,7 @@ public class SaleService {
         int totalQuantity = saleDto.quantity().stream().mapToInt(Integer::intValue).sum();
 
         Sale sale = new Sale(saleDto, finalValue, description, totalQuantity, LocalDateTime.now(), seller);
+        sale.setClient(client);
         sale.setDiscount(discount);
         sale.setPointsUsed(pointsUsed);
 

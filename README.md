@@ -108,6 +108,8 @@ As migrações são gerenciadas pelo Flyway e executadas automaticamente:
 | V5 | Constraint de unicidade no nome do produto |
 | V6 | Criação da tabela `clients` |
 | V7 | Coluna `seller` na tabela `sales` |
+| V8 | Criação da tabela `sale_items` (itens por venda, usada para restaurar estoque no cancelamento) |
+| V9 | Coluna `version` na tabela `products` (controle de concorrência otimista) |
 
 ---
 

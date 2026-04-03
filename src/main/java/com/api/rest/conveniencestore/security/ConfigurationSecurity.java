@@ -36,6 +36,7 @@ public class ConfigurationSecurity {
                         // endpoints públicos
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         // apenas ADMIN pode gerenciar usuários de forma destrutiva
                         .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/users/*/status").hasRole("ADMIN")

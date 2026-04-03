@@ -123,6 +123,7 @@ class SaleServiceTest {
 
     @Test
     void statusSaleCanceled_ShouldSetCancelledStatusAndRestoreStock() {
+        product.setStockQuantity(98); // simula estoque após venda de 2 unidades
         SaleItem saleItem = new SaleItem(sale, 1L, 2);
 
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
@@ -134,7 +135,7 @@ class SaleServiceTest {
         Sale result = saleService.statusSaleCanceled(1L, Status.CANCELLED);
 
         assertThat(result.getStatus()).isEqualTo(Status.CANCELLED);
-        assertThat(product.getStockQuantity()).isEqualTo(102); // 100 + 2 restaurados
+        assertThat(product.getStockQuantity()).isEqualTo(100); // 98 + 2 restaurados
         verify(productRepository).save(product);
         verify(saleRepository).save(sale);
     }

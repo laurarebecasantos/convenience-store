@@ -13,10 +13,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Autowired
     private TokenService tokenService;
@@ -40,8 +46,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             user, null, user.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-            } catch (Exception ignored) {
-                // token inválido — request prossegue sem autenticação
+            } catch (JWTVerificationException e) {
+                log.debug("Token JWT invalido: {}", e.getMessage());
             }
         }
 

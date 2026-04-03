@@ -2,7 +2,7 @@ package com.api.rest.conveniencestore.controller;
 
 import com.api.rest.conveniencestore.dto.AuthenticationDto;
 import com.api.rest.conveniencestore.dto.TokenJWTDto;
-import com.api.rest.conveniencestore.exceptions.AutheticationException;
+import com.api.rest.conveniencestore.exceptions.AuthenticationException;
 import com.api.rest.conveniencestore.exceptions.PasswordValidateException;
 import com.api.rest.conveniencestore.exceptions.UsernameValidateException;
 import com.api.rest.conveniencestore.model.User;
@@ -38,7 +38,7 @@ public class AuthenticationController {
     private UserValidator userValidator;
 
     @PostMapping
-    public ResponseEntity<TokenJWTDto> login(@Valid @RequestBody AuthenticationDto autDto) throws PasswordValidateException, AutheticationException, UsernameValidateException {
+    public ResponseEntity<TokenJWTDto> login(@Valid @RequestBody AuthenticationDto autDto) throws PasswordValidateException, AuthenticationException, UsernameValidateException {
         userValidator.validateUsernameAuthetication(autDto.username());
         passwordValidator.validatePassword(autDto.password());
 
@@ -48,7 +48,7 @@ public class AuthenticationController {
             String tokenJWT = tokenService.generateToken((User) authentication.getPrincipal());
             return ResponseEntity.ok(new TokenJWTDto(tokenJWT));
         } catch (Exception e) {
-            throw new AutheticationException(MessageConstants.CREDENTIALS_INVALID);
+            throw new AuthenticationException(MessageConstants.CREDENTIALS_INVALID);
         }
     }
 }

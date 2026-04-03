@@ -126,8 +126,8 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, "CONFLICT", except.getMessage());
     }
 
-    @ExceptionHandler(AutheticationException.class)
-    public ResponseEntity<ErrorResponse> autheticationException(AutheticationException except) {
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> authenticationException(AuthenticationException except) {
         return build(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", except.getMessage());
     }
 

@@ -5,12 +5,33 @@ services:
     image: mysql:8.0
     container_name: conveniencestore_mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_ROOT_PASSWORD: ${DB_SECRET:-root1234}
       MYSQL_DATABASE: conveniencestore_db
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: conveniencestore_app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://mysql:3306/conveniencestore_db
+      DB_USERNAME: root
+      DB_SECRET: ${DB_SECRET:-root1234}
+      JWT_SECRET: ${JWT_SECRET:-123456789}
+    ports:
+      - "8080:8080"
     restart: unless-stopped
 
 volumes:

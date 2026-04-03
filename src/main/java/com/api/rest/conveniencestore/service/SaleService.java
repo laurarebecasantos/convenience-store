@@ -38,6 +38,9 @@ public class SaleService {
     @Autowired
     private SaleItemRepository saleItemRepository;
 
+    @Autowired
+    private LoyaltyService loyaltyService;
+
     private SaleHelper saleHelper;
 
     @Autowired
@@ -60,12 +63,22 @@ public class SaleService {
         String seller = authenticatedUser.getUsername();
 
         double totalValue = saleHelper.calculateTotalValue(saleDto);
+
+        // aplica desconto por pontos, se solicitado
+        double discount = 0.0;
+        int pointsUsed = 0;
+        if (saleDto.pointsToUse() != null && saleDto.pointsToUse() > 0) {
+            discount = loyaltyService.redeemPoints(client, saleDto.pointsToUse(), totalValue, null);
+            pointsUsed = saleDto.pointsToUse();
+        }
+
+        double finalValue = totalValue - discount;
         String description = saleHelper.generateSaleDescription(saleDto, client, seller);
         int totalQuantity = saleDto.quantity().stream().mapToInt(Integer::intValue).sum();
 
-        LocalDateTime saleDate = LocalDateTime.now();
-
-        Sale sale = new Sale(saleDto, totalValue, description, totalQuantity, saleDate, seller);
+        Sale sale = new Sale(saleDto, finalValue, description, totalQuantity, LocalDateTime.now(), seller);
+        sale.setDiscount(discount);
+        sale.setPointsUsed(pointsUsed);
 
         saleHelper.validatePaymentMethod(sale, sale.getPaymentMethod());
 
@@ -81,6 +94,13 @@ public class SaleService {
 
             saleItemRepository.save(new SaleItem(savedSale, productId, quantity));
         }
+
+        // acumula pontos sobre o valor final (após desconto)
+        int pointsEarned = (int) Math.floor(finalValue);
+        loyaltyService.earnPoints(client, finalValue, savedSale.getId());
+        savedSale.setPointsEarned(pointsEarned);
+        saleRepository.save(savedSale);
+
         return savedSale;
     }
 
@@ -102,6 +122,9 @@ public class SaleService {
                 productRepository.save(product);
             });
         });
+
+        // estorna pontos da venda (saldo pode ficar negativo — comportamento esperado)
+        loyaltyService.cancelPoints(id);
 
         sale.setStatus(Status.CANCELLED);
         return saleRepository.save(sale);

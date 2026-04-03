@@ -19,6 +19,8 @@ public record SaleDto(
         PaymentMethod paymentMethod,
 
         @NotBlank(message = "Client CPF cannot be blank")
-        String clientCpf
+        String clientCpf,
+
+        Integer pointsToUse
 ) {
 }

@@ -40,6 +40,9 @@ public class ConfigurationSecurity {
                         .requestMatchers(HttpMethod.PATCH, "/products/**").hasRole("ADMIN")
                         // apenas ADMIN pode cancelar vendas
                         .requestMatchers(HttpMethod.PATCH, "/sales/*/status").hasRole("ADMIN")
+                        // apenas ADMIN pode ver extrato de pontos de clientes
+                        .requestMatchers(HttpMethod.GET, "/loyalty/clients/*/transactions").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/clients/*/points").hasRole("ADMIN")
                         // qualquer autenticado para o restante
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

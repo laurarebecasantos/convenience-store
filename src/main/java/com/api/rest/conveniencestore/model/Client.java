@@ -23,9 +23,21 @@ public class Client {
     @Column(unique = true)
     private String cpf;
 
+    @Column(name = "points_balance", nullable = false)
+    private int pointsBalance = 0;
+
     public Client(ClientDto data) {
         this.cpf = data.cpf();
         this.name = data.name();
+        this.pointsBalance = 0;
+    }
+
+    public void addPoints(int points) {
+        this.pointsBalance += points;
+    }
+
+    public void deductPoints(int points) {
+        this.pointsBalance -= points;
     }
 
     public void setCpf(String cpf) {

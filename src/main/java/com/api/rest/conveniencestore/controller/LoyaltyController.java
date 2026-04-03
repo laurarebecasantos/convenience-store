@@ -1,0 +1,37 @@
+package com.api.rest.conveniencestore.controller;
+
+import com.api.rest.conveniencestore.dto.LoyaltySimulateDto;
+import com.api.rest.conveniencestore.dto.LoyaltySimulateResponseDto;
+import com.api.rest.conveniencestore.dto.LoyaltyTransactionDto;
+import com.api.rest.conveniencestore.model.Client;
+import com.api.rest.conveniencestore.service.ClientService;
+import com.api.rest.conveniencestore.service.LoyaltyService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/loyalty")
+public class LoyaltyController {
+
+    @Autowired
+    private LoyaltyService loyaltyService;
+
+    @Autowired
+    private ClientService clientService;
+
+    @PostMapping("/simulate")
+    public ResponseEntity<LoyaltySimulateResponseDto> simulate(@Valid @RequestBody LoyaltySimulateDto dto) {
+        Client client = clientService.findById(dto.clientId());
+        LoyaltySimulateResponseDto response = loyaltyService.simulate(client, dto.purchaseAmount(), dto.pointsToUse());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/clients/{id}/transactions")
+    public ResponseEntity<List<LoyaltyTransactionDto>> getTransactions(@PathVariable Long id) {
+        return ResponseEntity.ok(loyaltyService.getTransactions(id));
+    }
+}

@@ -14,11 +14,17 @@ public record SaleListingDto(
 
         double totalValue,
 
+        double discount,
+
         PaymentMethod paymentMethod,
 
         int quantity,
 
         String seller,
+
+        int pointsEarned,
+
+        int pointsUsed,
 
         String description
 ) {
@@ -27,9 +33,12 @@ public record SaleListingDto(
                 sale.getId(),
                 sale.getSaleDate(),
                 sale.getTotalValue(),
+                sale.getDiscount(),
                 sale.getPaymentMethod(),
                 sale.getQuantity(),
                 sale.getSeller(),
+                sale.getPointsEarned(),
+                sale.getPointsUsed(),
                 sale.getDescription()
         );
     }

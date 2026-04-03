@@ -17,6 +17,7 @@ import com.api.rest.conveniencestore.repository.ClientRepository;
 import com.api.rest.conveniencestore.repository.ProductRepository;
 import com.api.rest.conveniencestore.repository.SaleItemRepository;
 import com.api.rest.conveniencestore.repository.SaleRepository;
+import com.api.rest.conveniencestore.service.LoyaltyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,6 +52,9 @@ class SaleServiceTest {
     @Mock
     private SaleItemRepository saleItemRepository;
 
+    @Mock
+    private LoyaltyService loyaltyService;
+
     @InjectMocks
     private SaleService saleService;
 
@@ -64,7 +68,7 @@ class SaleServiceTest {
 
         product = new Product(new ProductDto("Coca-Cola", Category.BEVERAGE, 5.0, 100, LocalDate.now().plusDays(30)));
         client = new Client(new ClientDto("Maria Silva", "123.456.789-09"));
-        sale = new Sale(new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09"),
+        sale = new Sale(new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09", null),
                 10.0, "desc", 2, LocalDateTime.now(), "testuser");
     }
 
@@ -78,7 +82,7 @@ class SaleServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09");
+        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09", null);
 
         when(clientRepository.findByCpf("123.456.789-09")).thenReturn(Optional.of(client));
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
@@ -97,7 +101,7 @@ class SaleServiceTest {
 
     @Test
     void registerSale_WhenClientNotFound_ShouldThrow() {
-        SaleDto dto = new SaleDto(List.of(1L), List.of(1), PaymentMethod.CASH, "000.000.000-00");
+        SaleDto dto = new SaleDto(List.of(1L), List.of(1), PaymentMethod.CASH, "000.000.000-00", null);
         when(clientRepository.findByCpf("000.000.000-00")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> saleService.registerSale(dto))

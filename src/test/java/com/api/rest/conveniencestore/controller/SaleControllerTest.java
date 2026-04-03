@@ -54,7 +54,7 @@ class SaleControllerTest {
 
     @BeforeEach
     void setUp() {
-        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09");
+        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09", null);
         sale = new Sale(dto, 10.0, "desc", 2, LocalDateTime.now(), "testuser");
     }
 
@@ -63,7 +63,7 @@ class SaleControllerTest {
     void register_WhenValidSale_ShouldReturn201() throws Exception {
         when(saleService.registerSale(any())).thenReturn(sale);
 
-        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09");
+        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09", null);
 
         mockMvc.perform(post("/sales")
                         .with(csrf())
@@ -126,7 +126,7 @@ class SaleControllerTest {
 
     @Test
     void register_WhenNotAuthenticated_ShouldReturn403() throws Exception {
-        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09");
+        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09", null);
 
         mockMvc.perform(post("/sales")
                         .contentType(MediaType.APPLICATION_JSON)

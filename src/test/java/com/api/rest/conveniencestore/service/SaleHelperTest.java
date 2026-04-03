@@ -47,7 +47,7 @@ class SaleHelperTest {
 
     @Test
     void calculateTotalValue_ShouldReturnCorrectSum() throws ProductNotFoundException {
-        SaleDto dto = new SaleDto(List.of(1L, 2L), List.of(2, 3), PaymentMethod.CASH, "123.456.789-09");
+        SaleDto dto = new SaleDto(List.of(1L, 2L), List.of(2, 3), PaymentMethod.CASH, "123.456.789-09", null);
         Product p2 = new Product(new ProductDto("Agua", Category.BEVERAGE, 2.0, 50, LocalDate.now().plusDays(30)));
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
@@ -60,7 +60,7 @@ class SaleHelperTest {
 
     @Test
     void calculateTotalValue_WhenProductNotFound_ShouldThrow() {
-        SaleDto dto = new SaleDto(List.of(99L), List.of(1), PaymentMethod.CASH, "123.456.789-09");
+        SaleDto dto = new SaleDto(List.of(99L), List.of(1), PaymentMethod.CASH, "123.456.789-09", null);
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> saleHelper.calculateTotalValue(dto))
@@ -69,7 +69,7 @@ class SaleHelperTest {
 
     @Test
     void generateSaleDescription_ShouldContainCpfAndProductName() throws ProductNotFoundException {
-        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09");
+        SaleDto dto = new SaleDto(List.of(1L), List.of(2), PaymentMethod.CASH, "123.456.789-09", null);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 
         String description = saleHelper.generateSaleDescription(dto, client, "testuser");
@@ -118,7 +118,7 @@ class SaleHelperTest {
 
     @Test
     void validatePaymentMethod_WhenNull_ShouldThrow() {
-        Sale sale = new Sale(new SaleDto(List.of(), List.of(), PaymentMethod.CASH, "cpf"), 0, "", 0, LocalDateTime.now(), "testuser");
+        Sale sale = new Sale(new SaleDto(List.of(), List.of(), PaymentMethod.CASH, "cpf", null), 0, "", 0, LocalDateTime.now(), "testuser");
 
         assertThatThrownBy(() -> saleHelper.validatePaymentMethod(sale, null))
                 .isInstanceOf(SaleNotValidPaymentMethodException.class);
@@ -126,7 +126,7 @@ class SaleHelperTest {
 
     @Test
     void validatePaymentMethod_WhenMatches_ShouldNotThrow() {
-        Sale sale = new Sale(new SaleDto(List.of(), List.of(), PaymentMethod.CASH, "cpf"), 0, "", 0, LocalDateTime.now(), "testuser");
+        Sale sale = new Sale(new SaleDto(List.of(), List.of(), PaymentMethod.CASH, "cpf", null), 0, "", 0, LocalDateTime.now(), "testuser");
 
         assertThatCode(() -> saleHelper.validatePaymentMethod(sale, PaymentMethod.CASH))
                 .doesNotThrowAnyException();

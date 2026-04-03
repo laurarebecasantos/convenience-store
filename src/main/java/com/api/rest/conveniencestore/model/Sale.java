@@ -48,6 +48,14 @@ public class Sale implements StatusUtil {
     @Column(name = "seller")
     private String seller;
 
+    @Column(name = "points_earned", nullable = false)
+    private int pointsEarned = 0;
+
+    @Column(name = "points_used", nullable = false)
+    private int pointsUsed = 0;
+
+    @Column(nullable = false)
+    private double discount = 0.0;
 
     public Sale(SaleDto saleDto, double totalValue, String description, int quantity, LocalDateTime saleDate, String seller) {
         this.description = description;
@@ -57,9 +65,24 @@ public class Sale implements StatusUtil {
         this.status = Status.APPROVED;
         this.saleDate = LocalDateTime.now();
         this.seller = seller;
+        this.pointsEarned = 0;
+        this.pointsUsed = 0;
+        this.discount = 0.0;
     }
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setPointsEarned(int pointsEarned) {
+        this.pointsEarned = pointsEarned;
+    }
+
+    public void setPointsUsed(int pointsUsed) {
+        this.pointsUsed = pointsUsed;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
     }
 }

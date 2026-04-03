@@ -167,6 +167,11 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Dados inválidos: " + fields);
     }
 
+    @ExceptionHandler(LoyaltyException.class)
+    public ResponseEntity<ErrorResponse> loyaltyException(LoyaltyException except) {
+        return build(HttpStatus.BAD_REQUEST, "LOYALTY_ERROR", except.getMessage());
+    }
+
     @ExceptionHandler({OptimisticLockException.class, ObjectOptimisticLockingFailureException.class})
     public ResponseEntity<ErrorResponse> handleOptimisticLock() {
         return build(HttpStatus.CONFLICT, "OPTIMISTIC_LOCK_CONFLICT",

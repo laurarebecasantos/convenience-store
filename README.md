@@ -157,6 +157,7 @@ As migrações são gerenciadas pelo Flyway e executadas automaticamente:
 | V11 | Constraint `CHECK (stock_quantity >= 0)` em products e índices de performance |
 | V12 | FK `client_id` na tabela `sales` com referência a `clients` |
 | V13 | Remove tabela órfã `sales_products` e adiciona FK `product_id` em `sale_items` |
+| V14 | Índices de performance para queries dos relatórios |
 
 ---
 
@@ -324,6 +325,33 @@ A resposta inclui metadados: `totalElements`, `totalPages`, `size`, `number`, al
 
 ---
 
+### Relatórios `/reports`
+
+| Método | Endpoint | Descrição | Auth | Role |
+|--------|----------|-----------|------|------|
+| GET | `/reports/sales?startDate=2025-01-01&endDate=2025-12-31&groupBy=MONTH` | Relatório de vendas por período | Sim | qualquer |
+| GET | `/reports/stock?daysToExpire=7` | Relatório de estoque | Sim | qualquer |
+| GET | `/reports/loyalty` | Relatório do programa de fidelidade | Sim | qualquer |
+| GET | `/reports/dashboard` | Resumo diário (dashboard) | Sim | qualquer |
+
+**Relatório de vendas** — Parâmetros:
+- `startDate` (obrigatório) — data inicial (ISO: `yyyy-MM-dd`)
+- `endDate` (obrigatório) — data final
+- `groupBy` (opcional, padrão: `DAY`) — agrupamento: `DAY`, `WEEK` ou `MONTH`
+
+Retorna por período: `totalRevenue`, `totalSales`, `averageTicket`, `totalItemsSold`
+
+**Relatório de estoque** — Parâmetros:
+- `daysToExpire` (opcional, padrão: 7)
+
+Retorna: `totalProducts`, `lowStockProducts` (estoque < 10), `outOfStockProducts`, `expiringSoon`, `expired`
+
+**Relatório de fidelidade** — Retorna: `totalPointsGenerated`, `totalPointsRedeemed`, `totalDiscountGiven`, `activeClients`, `expiredPoints`
+
+**Dashboard** — Retorna: `revenueToday`, `salesToday`, `lowStockProducts`, `pointsEarnedToday`
+
+---
+
 ## Exemplo de fluxo completo
 
 ```bash
@@ -366,7 +394,7 @@ Este projeto foi desenvolvido com objetivo de aprender e consolidar conhecimento
 7. Controle de estoque
 8. Fidelidade e pontuação de clientes
 9. Swagger/OpenAPI, Actuator, paginação, profiles e Docker
-10. Relatórios e estatísticas *(em desenvolvimento)*
+10. Relatórios e estatísticas
 
 Acompanhe o progresso no [Trello do projeto](https://trello.com/b/zd8yvutP/projeto-api-rest-usuario).
 

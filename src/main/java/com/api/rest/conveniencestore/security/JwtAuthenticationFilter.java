@@ -1,7 +1,7 @@
 package com.api.rest.conveniencestore.security;
 
-import com.api.rest.conveniencestore.repository.UserRepository;
-import com.api.rest.conveniencestore.service.TokenService;
+import com.api.rest.conveniencestore.user.repository.UserRepository;
+import com.api.rest.conveniencestore.user.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -500,7 +500,80 @@
       ]
     },
     {
-      "name": "7. Actuator",
+      "name": "7. Relatórios",
+      "item": [
+        {
+          "name": "Relatório de vendas por período",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/sales?startDate=2025-01-01&endDate=2025-12-31&groupBy=MONTH",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "sales"],
+              "query": [
+                { "key": "startDate", "value": "2025-01-01", "description": "Data inicial (formato: yyyy-MM-dd)" },
+                { "key": "endDate", "value": "2025-12-31", "description": "Data final (formato: yyyy-MM-dd)" },
+                { "key": "groupBy", "value": "MONTH", "description": "Agrupamento: DAY | WEEK | MONTH (padrão: DAY)" }
+              ]
+            },
+            "description": "Relatório de vendas agrupado por período. Retorna totalRevenue, totalSales, averageTicket e totalItemsSold por período. Requer autenticação."
+          }
+        },
+        {
+          "name": "Relatório de estoque",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/stock?daysToExpire=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "stock"],
+              "query": [
+                { "key": "daysToExpire", "value": "7", "description": "Dias para considerar produto como 'expirando em breve' (padrão: 7)" }
+              ]
+            },
+            "description": "Relatório resumido de estoque. Retorna totalProducts, lowStockProducts (estoque < 10), outOfStockProducts, expiringSoon e expired. Requer autenticação."
+          }
+        },
+        {
+          "name": "Relatório de fidelidade",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/loyalty",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "loyalty"]
+            },
+            "description": "Relatório do programa de fidelidade. Retorna totalPointsGenerated, totalPointsRedeemed, totalDiscountGiven, activeClients e expiredPoints. Requer autenticação."
+          }
+        },
+        {
+          "name": "Dashboard (resumo diário)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "dashboard"]
+            },
+            "description": "Resumo diário: revenueToday, salesToday, lowStockProducts e pointsEarnedToday. Requer autenticação."
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Actuator",
       "item": [
         {
           "name": "Health Check",

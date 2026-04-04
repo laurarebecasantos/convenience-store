@@ -1,0 +1,22 @@
+package com.api.rest.conveniencestore.product.repository;
+
+import com.api.rest.conveniencestore.shared.enums.Category;
+import com.api.rest.conveniencestore.product.model.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    Collection<Product> findByCategory(Category category);
+
+    boolean existsByName(String name);
+
+    boolean existsById(Long id);
+
+    List<Product> findByExpirationDateLessThanEqual(LocalDate expirationDate);
+
+    List<Product> findByExpirationDateBetween(LocalDate start, LocalDate end);
+}

@@ -1,6 +1,10 @@
 # Convenience Store API
 
-API REST para gerenciamento de uma conveniência, desenvolvida com Spring Boot. Cobre autenticação com JWT, gestão de usuários, produtos, clientes e vendas.
+API REST para gerenciamento de uma conveniência, desenvolvida com Spring Boot. Cobre autenticação com JWT, gestão de usuários, produtos, clientes, vendas, programa de fidelidade e relatórios.
+
+## Arquitetura
+
+O projeto segue uma arquitetura **feature-based (orientada a domínio)**, onde cada domínio contém seus próprios controllers, services, repositories, DTOs e models. Isso garante alta coesão, baixo acoplamento entre domínios e facilidade de manutenção.
 
 ## Tecnologias
 
@@ -124,17 +128,55 @@ Use o botão "Authorize" no Swagger UI para informar o Bearer Token.
 
 ```
 src/main/java/com/api/rest/conveniencestore/
-├── controller/       # Endpoints REST
-├── service/          # Regras de negócio
-├── repository/       # Acesso a dados (Spring Data JPA)
-├── model/            # Entidades JPA
-├── dto/              # Objetos de transferência de dados
-├── security/         # Configuração do Spring Security
-├── enums/            # Enumerações (Status, Roles, PaymentMethod, Category)
-├── exceptions/       # Exceções customizadas e handler global
-├── validations/      # Validações (CPF, senha, usuário)
-└── utils/            # Utilitários e constantes
+├── config/                        # Configurações (OpenAPI/Swagger)
+├── security/                      # Spring Security + JWT filter
+├── shared/                        # Infraestrutura compartilhada
+│   ├── enums/                     #   Status, Roles, PaymentMethod, Category, TransactionType
+│   ├── exception/                 #   Exceções customizadas + GlobalExceptionHandler
+│   ├── validation/                #   Validadores (CPF, senha, username)
+│   └── utils/                     #   Constantes e utilitários
+├── user/                          # Domínio: Usuários e Autenticação
+│   ├── controller/                #   UserController, AuthenticationController
+│   ├── service/                   #   UserService, AuthenticationService, TokenService
+│   ├── repository/                #   UserRepository
+│   ├── dto/                       #   UserDto, AuthenticationDto, TokenJWTDto, etc.
+│   └── model/                     #   User
+├── product/                       # Domínio: Produtos
+│   ├── controller/
+│   ├── service/
+│   ├── repository/
+│   ├── dto/
+│   └── model/
+├── client/                        # Domínio: Clientes
+│   ├── controller/
+│   ├── service/
+│   ├── repository/
+│   ├── dto/
+│   └── model/
+├── sale/                          # Domínio: Vendas
+│   ├── controller/
+│   ├── service/                   #   SaleService, SaleHelper
+│   ├── repository/                #   SaleRepository, SaleItemRepository
+│   ├── dto/
+│   └── model/                     #   Sale, SaleItem
+├── loyalty/                       # Domínio: Programa de Fidelidade
+│   ├── controller/
+│   ├── service/
+│   ├── repository/                #   LoyaltyPointRepository, LoyaltyTransactionRepository
+│   ├── dto/
+│   └── model/                     #   LoyaltyPoint, LoyaltyTransaction
+└── reports/                       # Domínio: Relatórios (somente leitura)
+    ├── sales/                     #   controller, service, repository, dto, projection
+    ├── stock/                     #   controller, service, repository, dto, projection
+    ├── loyalty/                   #   controller, service, repository, dto, projection
+    └── dashboard/                 #   controller, service, dto
 ```
+
+**Dependências entre domínios:**
+- `sale` depende de `client`, `product` e `loyalty` (integração natural do fluxo de vendas)
+- `loyalty` depende de `client` (programa de fidelidade vinculado ao cliente)
+- `reports` depende dos demais domínios (somente leitura, unidirecional)
+- Os demais domínios **não** dependem de `reports`
 
 ---
 
@@ -372,11 +414,17 @@ curl -X POST http://localhost:8080/products \
   -H "Content-Type: application/json" \
   -d '{"name":"Água Mineral","category":"BEVERAGE","price":3.50,"stockQuantity":100,"expirationDate":"2025-12-31"}'
 
-# 4. Registrar venda
+# 4. Cadastrar cliente
+curl -X POST http://localhost:8080/clients \
+  -H "Authorization: Bearer eyJ..." \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Joao","cpf":"123.456.789-09"}'
+
+# 5. Registrar venda
 curl -X POST http://localhost:8080/sales \
   -H "Authorization: Bearer eyJ..." \
   -H "Content-Type: application/json" \
-  -d '{"paymentMethod":"CASH","products":[{"id":1,"quantity":2}]}'
+  -d '{"productIds":[1],"quantity":[2],"paymentMethod":"CASH","clientCpf":"123.456.789-09"}'
 ```
 
 ---
@@ -394,7 +442,8 @@ Este projeto foi desenvolvido com objetivo de aprender e consolidar conhecimento
 7. Controle de estoque
 8. Fidelidade e pontuação de clientes
 9. Swagger/OpenAPI, Actuator, paginação, profiles e Docker
-10. Relatórios e estatísticas
+10. Relatórios e estatísticas (vendas, estoque, fidelidade, dashboard)
+11. Refatoração para arquitetura feature-based (orientada a domínio)
 
 Acompanhe o progresso no [Trello do projeto](https://trello.com/b/zd8yvutP/projeto-api-rest-usuario).
 

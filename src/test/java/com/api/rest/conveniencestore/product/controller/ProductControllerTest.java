@@ -10,12 +10,14 @@ import com.api.rest.conveniencestore.product.repository.ProductRepository;
 import com.api.rest.conveniencestore.user.repository.UserRepository;
 import com.api.rest.conveniencestore.product.service.ProductService;
 import com.api.rest.conveniencestore.user.service.TokenService;
+import com.api.rest.conveniencestore.security.ConfigurationSecurity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductController.class)
+@Import(ConfigurationSecurity.class)
 class ProductControllerTest {
 
     @Autowired
